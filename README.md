@@ -6,7 +6,7 @@ Create beautiful images parallax with attributes or in javascript for your websi
 
 ## NPM
 ```
-npm i parallaxy
+npm i parallaxy-img
 ```
 
 ## CDN
