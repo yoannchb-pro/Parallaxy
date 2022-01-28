@@ -104,24 +104,28 @@ class Parallaxy{
         return true;
     }
 
-    isIntersectingObserver(element){
-        const width = window.innerWidth;
+    isIntersectingObserver(element, translation = {x: 0, y: 0}){
         const height = window.innerHeight;
     
-        const pos = element.getBoundingClientRect();
+        const rec = element.getBoundingClientRect();
+
+        //Because rec is only in read mode
+        const pos = {
+            top: rec.top,
+            bottom: rec.bottom,
+        }
+
+        pos.top = pos.top + translation.y;
+        pos.bottom = pos.bottom + translation.y;
     
-        let hIntersect = false;
         let vIntersect = false;
     
         let topCondition = pos.top >= 0 && pos.top <= height;
         let bottomCondition = pos.bottom >= 0 && pos.bottom <= height;
-        let leftCondition = pos.left >= 0 && pos.left <= width;
-        let rightCondition = pos.right >= 0 && pos.right <= width;
     
         if(topCondition || bottomCondition || (pos.top < 0 && pos.bottom > height)) vIntersect = true;
-        if(leftCondition || rightCondition || (pos.left < 0 && pos.right > width)) hIntersect = true;
     
-        if(hIntersect && vIntersect) return true;
+        if(vIntersect) return true;
     
         return false;
     }
@@ -153,8 +157,19 @@ class Parallaxy{
 
                 transform.push(obj.scale());
 
-                if(obj.config.y) transform.push(obj.translateY(el));
-                if(obj.config.x) transform.push(obj.translateX(el));
+                let translation = {x: 0, y: 0};
+
+                if(obj.config.y) {
+                    const transY = obj.translateY(el);
+                    translation.y = transY;
+                    transform.push(`translateY(${transY}px)`);
+                }
+
+                if(obj.config.x) {
+                    const transX = obj.translateX(el);
+                    translation.x = transX;
+                    transform.push(`translateX(${transX}px)`);
+                }
         
                 el.style.transform = transform.join(' ');
             };
@@ -208,7 +223,7 @@ class Parallaxy{
             translation = translation < 0 ? -newPosition : newPosition;
         }
 
-        return `translateY(${translation}px)`;
+        return translation;
     }
 
     translateX(el){
@@ -231,7 +246,7 @@ class Parallaxy{
             translation = translation < 0 ? -newPosition : newPosition;
         }
 
-        return `translateX(${translation}px)`;
+        return translation;
     }
 }
 

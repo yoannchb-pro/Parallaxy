@@ -108,18 +108,24 @@ var Parallaxy = /*#__PURE__*/function () {
   }, {
     key: "isIntersectingObserver",
     value: function isIntersectingObserver(element) {
-      var width = window.innerWidth;
+      var translation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        x: 0,
+        y: 0
+      };
       var height = window.innerHeight;
-      var pos = element.getBoundingClientRect();
-      var hIntersect = false;
+      var rec = element.getBoundingClientRect(); //Because rec is only in read mode
+
+      var pos = {
+        top: rec.top,
+        bottom: rec.bottom
+      };
+      pos.top = pos.top + translation.y;
+      pos.bottom = pos.bottom + translation.y;
       var vIntersect = false;
       var topCondition = pos.top >= 0 && pos.top <= height;
       var bottomCondition = pos.bottom >= 0 && pos.bottom <= height;
-      var leftCondition = pos.left >= 0 && pos.left <= width;
-      var rightCondition = pos.right >= 0 && pos.right <= width;
       if (topCondition || bottomCondition || pos.top < 0 && pos.bottom > height) vIntersect = true;
-      if (leftCondition || rightCondition || pos.left < 0 && pos.right > width) hIntersect = true;
-      if (hIntersect && vIntersect) return true;
+      if (vIntersect) return true;
       return false;
     }
   }, {
@@ -147,8 +153,23 @@ var Parallaxy = /*#__PURE__*/function () {
         if (valid && intersecting) {
           var transform = [];
           transform.push(obj.scale());
-          if (obj.config.y) transform.push(obj.translateY(el));
-          if (obj.config.x) transform.push(obj.translateX(el));
+          var translation = {
+            x: 0,
+            y: 0
+          };
+
+          if (obj.config.y) {
+            var transY = obj.translateY(el);
+            translation.y = transY;
+            transform.push("translateY(".concat(transY, "px)"));
+          }
+
+          if (obj.config.x) {
+            var transX = obj.translateX(el);
+            translation.x = transX;
+            transform.push("translateX(".concat(transX, "px)"));
+          }
+
           el.style.transform = transform.join(' ');
         }
 
@@ -202,7 +223,7 @@ var Parallaxy = /*#__PURE__*/function () {
         translation = translation < 0 ? -newPosition : newPosition;
       }
 
-      return "translateY(".concat(translation, "px)");
+      return translation;
     }
   }, {
     key: "translateX",
@@ -224,7 +245,7 @@ var Parallaxy = /*#__PURE__*/function () {
         translation = translation < 0 ? -newPosition : newPosition;
       }
 
-      return "translateX(".concat(translation, "px)");
+      return translation;
     }
   }]);
 

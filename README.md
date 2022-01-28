@@ -6,6 +6,9 @@ Create beautiful images parallax with attributes or in javascript for your websi
 
 ## Update
 
+v1.0.3
+- Fixed bug for parallaxy x when the element go out of the screen
+
 v1.0.2
 - Added `breakPoint` parameter (parallaxy-breakpoint)
 - Speed bug correction
@@ -19,6 +22,9 @@ v1.0.1
 ## NPM
 ```
 npm i parallaxy-img
+```
+```js
+const {Parallaxy, ParallaxyAttributes, ParallaxyDefaultconfig} = require("parallaxy-img");
 ```
 
 ## CDN
