@@ -5,6 +5,15 @@
  * https://github.com/yoannchb-pro/Parallaxy
  */
 
+//For each for IE
+if(window.NodeList && !NodeList.prototype.forEach) {
+    NodeList.prototype.forEach = Array.prototype.forEach;
+}
+
+if(window.HTMLCollection && !HTMLCollection.prototype.forEach) {
+    HTMLCollection.prototype.forEach = Array.prototype.forEach;
+}
+
 //ALL PARALLAXY ATTRIBUTES
 const ParallaxyAttributes = [
     "parallaxy-y",
@@ -32,7 +41,7 @@ class Parallaxy{
         this.config = config;
 
         this.$el = this.config.element[0] ? this.config.element : [this.config.element];
-        this.$el.forEach((el) => el.style.willChange = "transform");
+        this.$el.forEach(function(el){ el.style.willChange = "transform"});
 
         this.start();
     }
@@ -54,9 +63,9 @@ class Parallaxy{
     start(){
         document.addEventListener("scroll", this.updatePosition.bind(this));
 
-        this.$el.forEach((el) => {
-            el.stopParallaxy = this.removeElement.bind(this, el);
-            el.addEventListener('load', this.updatePosition.bind(this))
+        const obj = this;
+        this.$el.forEach(function(el){
+            el.addEventListener('load', obj.updatePosition.bind(obj))
         });
 
         this.updatePosition();
@@ -81,20 +90,33 @@ class Parallaxy{
     }
 
     reset(){
-        this.$el.forEach((el) => {
+        this.$el.forEach(function(el){
             el.transform = "";
         });
     }
 
-    updatePosition(){
-        this.$el.forEach((el) => {
-            const transform = [];
+    verifyParallaxy(el){
+        if(el.getAttribute('parallaxy-x') == null && el.getAttribute('parallaxy-y') == null){
+            this.removeElement(el);
+            return false;
+        }
+        return true;
+    }
 
-            transform.push(this.scale());
-            if(this.config.y) transform.push(this.translateY(el));
-            if(this.config.x) transform.push(this.translateX(el))
-    
-            el.style.transform = transform.join(' ');
+    updatePosition(){
+        const obj = this;
+        this.$el.forEach(function(el){
+            const valid = obj.verifyParallaxy.bind(obj, el)();
+
+            if(valid){
+                const transform = [];
+
+                transform.push(obj.scale());
+                if(obj.config.y) transform.push(obj.translateY(el));
+                if(obj.config.x) transform.push(obj.translateX(el))
+        
+                el.style.transform = transform.join(' ');
+            };
         });
     }
 
@@ -244,12 +266,12 @@ function ParallaxyObserver(){
     const observerDOM = new MutationObserver(function(mutations){
         if (!mutations) return;
 
-        mutations.forEach((mutation) => { 
+        mutations.forEach(function(mutation){ 
             const addedNodes = Array.prototype.slice.call(mutation.addedNodes);
             const removedNodes = Array.prototype.slice.call(mutation.removedNodes);
 
             const attr = mutation.attributeName;
-            if(attr && attr.includes('parallaxy')) {
+            if(attr && attr.indexOf('parallaxy') != -1) {
                 const el = mutation.target;
                 if(el.getAttribute('parallaxy-x') != null || el.getAttribute('parallaxy-y') != null){
                     addedNodes.push(el);
@@ -259,10 +281,6 @@ function ParallaxyObserver(){
             }
 
             if(addedNodes && addedNodes.length > 0) ParallaxyAttributesHandler(addedNodes);
-            
-            removedNodes.forEach(node => {
-                if(node.stopParallaxy) node.stopParallaxy();
-            });
         })
     });
 

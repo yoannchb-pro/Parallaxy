@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 
-    <script type="text/javascript" src="./src/parallaxy.js"></script>
+    <script type="text/javascript" src="./dist/parallaxy.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -43,13 +43,13 @@ npm i parallaxy-img
             <h3>CDN</h3>
             <pre>
                 <code class="language-html">
-<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/yoannchb-pro/Parallaxy/src/parallaxy.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/yoannchb-pro/Parallaxy/dist/parallaxy.min.js"></script>
                 </code>
             </pre>
             <h3>GITHUB</h3>
             <pre>
                 <code class="language-html">
-<script type="text/javascript" src="./src/parallaxy.js"></script>
+<script type="text/javascript" src="./dist/parallaxy.js"></script>
                 </code>
             </pre>
             <h3>How to use ?</h3>
@@ -73,10 +73,7 @@ const parallaxy = new Parallaxy({
 });
 
 parallaxy.addElement(...); //Add element to parallaxy configuration
-
 parallaxy.removeElement(...); //Remove element from parallaxy configuration
-element.stopParallaxy(); //DO the same. A method is added to your Node
-
 parallaxy.start(); //Auto start is always actived
 parallaxy.stop(); //Stop parallaxy
 parallaxy.reset(); //To remove transformation of each elements after stop
