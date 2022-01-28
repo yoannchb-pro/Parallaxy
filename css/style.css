@@ -17,6 +17,10 @@ body, html{
     text-decoration: none;
 }
 
+img{
+    width: 100%;
+}
+
 .container{
     width: 60%;
     margin-top: 5rem;
@@ -41,12 +45,17 @@ header h1{
     text-decoration: underline;
 }
 
+.thx{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: calc(100vh - 10rem);
+}
+
 .thx h2{
     font-size: 4rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
-    margin-top: 15rem;
-    margin-bottom: 15rem;
+    display: inline-block;
 
     text-align: center;
 }
@@ -70,9 +79,25 @@ header h1{
     align-items: center;
 }
 
-img{
-    width: 100%;
+.line-container{
+    width: auto;
+    margin-left: -20rem;
+    padding: 1rem;
+    height: 10rem;
+    white-space: nowrap;
+    overflow: hidden;
 }
+
+.line-container img{
+    display: inline-block;
+    width: 10rem;
+    height: auto;
+}
+
+.title{
+    color: rebeccapurple;
+}
+
 
 @media only screen and (max-width: 900px) {
     .container {
@@ -91,6 +116,10 @@ img{
 
     .pres h3{
         font-size: 1.5rem;
+    }
+
+    .thx{
+        height: 100vh;
     }
 
     img{

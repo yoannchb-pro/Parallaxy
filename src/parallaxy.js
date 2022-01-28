@@ -19,18 +19,19 @@ const ParallaxyAttributes = [
     "parallaxy-y",
     "parallaxy-x",
     "parallaxy-scale",
+    "parallaxy-breakpoint",
     "parallaxy-speed-x",
     "parallaxy-speed-y",
     "parallaxy-overflow-x",
     "parallaxy-overflow-y",
     "parallaxy-inverted-x",
-    "parallaxy-inverted-y"
+    "parallaxy-inverted-y",
 ];
 
 //DEFAULT CONFIG
 const ParallaxyDefaultconfig = {
     speed: 0.5,
-    scale: 1.5
+    scale: 1.5,
 }
 
 //PARALLAXY MAIN CLASS
@@ -51,8 +52,8 @@ class Parallaxy{
 
         if(!config.x && !config.y) config.y = {speed: ParallaxyDefaultconfig.speed};
 
-        if(config.x && !config.x.speed) config.x.speed = {speed: ParallaxyDefaultconfig.speed};
-        if(config.y && !config.y.speed) config.y.speed = {speed: ParallaxyDefaultconfig.speed};
+        if(config.x && !config.x.speed) config.x.speed = ParallaxyDefaultconfig.speed;
+        if(config.y && !config.y.speed) config.y.speed = ParallaxyDefaultconfig.speed;
 
         if(config.scale < 1) throw "[Parallaxy] 'scale' need to be bigger than 1 (or equal but with overflow)";
         if(!config.scale) config.scale = ParallaxyDefaultconfig.scale;
@@ -91,7 +92,7 @@ class Parallaxy{
 
     reset(){
         this.$el.forEach(function(el){
-            el.transform = "";
+            el.style.transform = "";
         });
     }
 
@@ -103,17 +104,57 @@ class Parallaxy{
         return true;
     }
 
-    updatePosition(){
-        const obj = this;
-        this.$el.forEach(function(el){
-            const valid = obj.verifyParallaxy.bind(obj, el)();
+    isIntersectingObserver(element){
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+    
+        const pos = element.getBoundingClientRect();
+    
+        let hIntersect = false;
+        let vIntersect = false;
+    
+        let topCondition = pos.top >= 0 && pos.top <= height;
+        let bottomCondition = pos.bottom >= 0 && pos.bottom <= height;
+        let leftCondition = pos.left >= 0 && pos.left <= width;
+        let rightCondition = pos.right >= 0 && pos.right <= width;
+    
+        if(topCondition || bottomCondition || (pos.top < 0 && pos.bottom > height)) vIntersect = true;
+        if(leftCondition || rightCondition || (pos.left < 0 && pos.right > width)) hIntersect = true;
+    
+        if(hIntersect && vIntersect) return true;
+    
+        return false;
+    }
 
-            if(valid){
+    matchingBreakingPoint(){
+        const breakingPoint = this.config.breakPoint;
+
+        if(!breakingPoint) return false;
+
+        if(window.matchMedia(breakingPoint).matches){
+            this.reset();
+            return true;
+        }
+
+        return false;
+    }
+
+    updatePosition(){
+        const breaking = this.matchingBreakingPoint();
+
+        const obj = this;
+        
+        if(!breaking) this.$el.forEach(function(el){
+            const valid = obj.verifyParallaxy.bind(obj, el)();
+            const intersecting = obj.isIntersectingObserver(el);
+
+            if(valid && intersecting){
                 const transform = [];
 
                 transform.push(obj.scale());
+
                 if(obj.config.y) transform.push(obj.translateY(el));
-                if(obj.config.x) transform.push(obj.translateX(el))
+                if(obj.config.x) transform.push(obj.translateX(el));
         
                 el.style.transform = transform.join(' ');
             };
@@ -155,7 +196,7 @@ class Parallaxy{
         const originalRect = this.originalRect(el);
 
         const scaleSize = originalRect.additionalHeight/2;
-        const elementCenterPosition = (scaledRect.top + scaledRect.height/2);
+        const elementCenterPosition = scaledRect.top + scaledRect.height/2;
         const screenMiddleSize = window.innerHeight/2;
         const elementPositionFromTop =  screenMiddleSize - elementCenterPosition;
 
@@ -178,7 +219,7 @@ class Parallaxy{
         const originalRect = this.originalRect(el);
 
         const scaleSize = originalRect.additionalWidth/2;
-        const elementCenterPosition = (scaledRect.top + scaledRect.height/2);
+        const elementCenterPosition = scaledRect.top + scaledRect.height/2;
         const screenMiddleSize = window.innerHeight/2;
         const elementPositionFromTop =  screenMiddleSize - elementCenterPosition;
 
@@ -243,8 +284,13 @@ function ParallaxyAttributesHandler(elements){
                 config.y = confY;
             }
 
+            //scale
             const scale = el.getAttribute('parallaxy-scale');
-            if(scale) config.scale = parseFloat(scale);
+            if(scale != null) config.scale = parseFloat(scale);
+
+            //break point
+            const breakPoint = el.getAttribute('parallaxy-breakpoint');
+            if(breakPoint != null) config.breakPoint = breakPoint;
 
             new Parallaxy(config);
         }
@@ -298,3 +344,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
     ParallaxyAttributesHandler(document.querySelectorAll('[parallaxy-y], [parallaxy-x]'));
 });
+
+//EXPORT
+if (typeof exports == "object") module.exports = {ParallaxyAttributes, Parallaxy, ParallaxyDefaultconfig};

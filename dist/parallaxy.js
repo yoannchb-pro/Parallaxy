@@ -1,5 +1,7 @@
 "use strict";
 
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -22,7 +24,7 @@ if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
 } //ALL PARALLAXY ATTRIBUTES
 
 
-var ParallaxyAttributes = ["parallaxy-y", "parallaxy-x", "parallaxy-scale", "parallaxy-speed-x", "parallaxy-speed-y", "parallaxy-overflow-x", "parallaxy-overflow-y", "parallaxy-inverted-x", "parallaxy-inverted-y"]; //DEFAULT CONFIG
+var ParallaxyAttributes = ["parallaxy-y", "parallaxy-x", "parallaxy-scale", "parallaxy-breakpoint", "parallaxy-speed-x", "parallaxy-speed-y", "parallaxy-overflow-x", "parallaxy-overflow-y", "parallaxy-inverted-x", "parallaxy-inverted-y"]; //DEFAULT CONFIG
 
 var ParallaxyDefaultconfig = {
   speed: 0.5,
@@ -49,12 +51,8 @@ var Parallaxy = /*#__PURE__*/function () {
       if (!config.x && !config.y) config.y = {
         speed: ParallaxyDefaultconfig.speed
       };
-      if (config.x && !config.x.speed) config.x.speed = {
-        speed: ParallaxyDefaultconfig.speed
-      };
-      if (config.y && !config.y.speed) config.y.speed = {
-        speed: ParallaxyDefaultconfig.speed
-      };
+      if (config.x && !config.x.speed) config.x.speed = ParallaxyDefaultconfig.speed;
+      if (config.y && !config.y.speed) config.y.speed = ParallaxyDefaultconfig.speed;
       if (config.scale < 1) throw "[Parallaxy] 'scale' need to be bigger than 1 (or equal but with overflow)";
       if (!config.scale) config.scale = ParallaxyDefaultconfig.scale;
       return config;
@@ -94,7 +92,7 @@ var Parallaxy = /*#__PURE__*/function () {
     key: "reset",
     value: function reset() {
       this.$el.forEach(function (el) {
-        el.transform = "";
+        el.style.transform = "";
       });
     }
   }, {
@@ -108,13 +106,45 @@ var Parallaxy = /*#__PURE__*/function () {
       return true;
     }
   }, {
+    key: "isIntersectingObserver",
+    value: function isIntersectingObserver(element) {
+      var width = window.innerWidth;
+      var height = window.innerHeight;
+      var pos = element.getBoundingClientRect();
+      var hIntersect = false;
+      var vIntersect = false;
+      var topCondition = pos.top >= 0 && pos.top <= height;
+      var bottomCondition = pos.bottom >= 0 && pos.bottom <= height;
+      var leftCondition = pos.left >= 0 && pos.left <= width;
+      var rightCondition = pos.right >= 0 && pos.right <= width;
+      if (topCondition || bottomCondition || pos.top < 0 && pos.bottom > height) vIntersect = true;
+      if (leftCondition || rightCondition || pos.left < 0 && pos.right > width) hIntersect = true;
+      if (hIntersect && vIntersect) return true;
+      return false;
+    }
+  }, {
+    key: "matchingBreakingPoint",
+    value: function matchingBreakingPoint() {
+      var breakingPoint = this.config.breakPoint;
+      if (!breakingPoint) return false;
+
+      if (window.matchMedia(breakingPoint).matches) {
+        this.reset();
+        return true;
+      }
+
+      return false;
+    }
+  }, {
     key: "updatePosition",
     value: function updatePosition() {
+      var breaking = this.matchingBreakingPoint();
       var obj = this;
-      this.$el.forEach(function (el) {
+      if (!breaking) this.$el.forEach(function (el) {
         var valid = obj.verifyParallaxy.bind(obj, el)();
+        var intersecting = obj.isIntersectingObserver(el);
 
-        if (valid) {
+        if (valid && intersecting) {
           var transform = [];
           transform.push(obj.scale());
           if (obj.config.y) transform.push(obj.translateY(el));
@@ -242,10 +272,14 @@ function ParallaxyAttributesHandler(elements) {
 
         confY.overflow = _overflow;
         config.y = confY;
-      }
+      } //scale
+
 
       var scale = el.getAttribute('parallaxy-scale');
-      if (scale) config.scale = parseFloat(scale);
+      if (scale != null) config.scale = parseFloat(scale); //break point
+
+      var breakPoint = el.getAttribute('parallaxy-breakpoint');
+      if (breakPoint != null) config.breakPoint = breakPoint;
       new Parallaxy(config);
     }
   });
@@ -290,4 +324,10 @@ function ParallaxyObserver() {
 document.addEventListener('DOMContentLoaded', function () {
   ParallaxyObserver();
   ParallaxyAttributesHandler(document.querySelectorAll('[parallaxy-y], [parallaxy-x]'));
-});
+}); //EXPORT
+
+if ((typeof exports === "undefined" ? "undefined" : _typeof(exports)) == "object") module.exports = {
+  ParallaxyAttributes: ParallaxyAttributes,
+  Parallaxy: Parallaxy,
+  ParallaxyDefaultconfig: ParallaxyDefaultconfig
+};

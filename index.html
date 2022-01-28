@@ -23,7 +23,7 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <script type="text/javascript" src="./dist/parallaxy.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
     <div class="container">
@@ -34,10 +34,16 @@
         </header>
 
         <div class="pres">
+            <h3 class="title">Installation ?</h3>
             <h3>NPM</h3>
             <pre>
                 <code class="language-bash">
 npm i parallaxy-img
+                </code>
+            </pre>
+            <pre>
+                <code class="language-javascript">
+const {Parallaxy, ParallaxyAttributes, ParallaxyDefaultconfig} = require("parallaxy-img");
                 </code>
             </pre>
             <h3>CDN</h3>
@@ -52,7 +58,25 @@ npm i parallaxy-img
 <script type="text/javascript" src="./dist/parallaxy.js"></script>
                 </code>
             </pre>
-            <h3>How to use ?</h3>
+            <h3 class="title">How to use ?</h3>
+            <h3>HTML ATTRIBUTES</h3>
+            <pre>
+                <code class="language-javascript">
+[
+    "parallaxy-y",
+    "parallaxy-x",
+    "parallaxy-scale",
+    "parallaxy-breakpoint",
+    "parallaxy-speed-x",
+    "parallaxy-speed-y",
+    "parallaxy-overflow-x",
+    "parallaxy-overflow-y",
+    "parallaxy-inverted-x",
+    "parallaxy-inverted-y",
+]
+                </code>
+            </pre>
+            <h3>JAVASCRIPT</h3>
             <pre>
                 <code class="language-javascript">
 console.log(ParallaxyDefaultconfig, ParallaxyAttributes);
@@ -69,6 +93,7 @@ const parallaxy = new Parallaxy({
         invert: false,
         overflow: false
     },
+    breakPoint: "(max-width: 600px)", //Will stop parallax on mobile
     scale: 1.5 //Need to be >= 1
 });
 
@@ -82,7 +107,7 @@ parallaxy.reset(); //To remove transformation of each elements after stop
         </div>
 
         <div class="pres">
-            <h3>Simple example on Y</h3>
+            <h3 class="title">Simple example on Y</h3>
             <div class="img-container">
                 <img src="assets/test.jpg" alt="Test" parallaxy-y>
             </div>
@@ -105,7 +130,7 @@ new Parallaxy({
         </div>
 
         <div class="pres">
-            <h3>Simple example on X</h3>
+            <h3 class="title">Simple example on X</h3>
             <div class="img-container">
                 <img src="assets/test2.jpg" alt="Test" parallaxy-x parallaxy-speed-x="0.1">
             </div>
@@ -131,7 +156,38 @@ new Parallaxy({
         </div>
 
         <div class="pres">
-            <h3>Simple example on X and Y</h3>
+            <h3 class="title">Simple overflow on X for multiples images</h3>
+            <div class="line-container" id="line-1">
+                <!-- GENERATED CONTENT -->
+            </div>
+            <h3>CSS</h3>
+            <pre>
+                <code class="language-css" style="text-align: left">
+.line-container{
+    width: auto;
+    margin-left: -20rem;
+    padding: 1rem;
+    height: 10rem;
+    white-space: nowrap;
+    overflow: hidden;
+}
+                    
+.line-container img{
+    display: inline-block;
+    width: 10rem;
+}
+                </code>
+            </pre>
+            <h3>HTML</h3>
+            <pre>
+                <code class="language-html">
+<img src="assets/vuejs.png" alt="Test" parallaxy-x parallaxy-overflow-x parallaxy-speed-x="0.6" parallaxy-scale="1">
+                </code>
+            </pre>
+        </div>
+
+        <div class="pres">
+            <h3 class="title">Simple example on X and Y</h3>
             <div class="img-container">
                 <img src="assets/test3.jpg" alt="Test" parallaxy-y parallaxy-x parallaxy-speed-x="0.2">
             </div>
@@ -158,7 +214,7 @@ new Parallaxy({
         </div>
 
         <div class="pres">
-            <h3>Simple example on X with overflow</h3>
+            <h3 class="title">Simple example on X with overflow</h3>
             <div class="img-container">
                 <img src="assets/test4.jpg" alt="Test" parallaxy-overflow-x parallaxy-x parallaxy-speed-x="0.5">
             </div>
@@ -185,7 +241,7 @@ new Parallaxy({
         </div>
 
         <div class="pres">
-            <h3>Simple example on X inverted direction</h3>
+            <h3 class="title">Simple example on X inverted direction</h3>
             <div class="img-container">
                 <img src="assets/test5.jpg" alt="Test" parallaxy-x parallaxy-inverted-x parallaxy-speed-x="0.2">
             </div>
@@ -211,8 +267,33 @@ new Parallaxy({
             <!-- END CODE -->
         </div>
 
+
         <div class="pres">
-            <h3>Simple example on Y inverted direction</h3>
+            <h3 class="title">Simple example of Parallaxy breakPoint</h3>
+            <div class="img-container">
+                <img src="assets/testb.jpg" alt="Test" parallaxy-y parallaxy-breakpoint="(max-width: 600px)">
+            </div>
+            <!-- CODE -->
+            <h3>HTML</h3>
+            <pre>
+                <code class="language-html">
+<img src="assets/test.jpg" alt="Test" parallaxy-y parallaxy-breakpoint="(max-width: 600px)">
+                </code>
+            </pre>
+            <h3>JAVASCRIPT</h3>
+            <pre>
+                <code class="language-javascript">
+new Parallaxy({
+    element: document.querySelectorAll('img'),
+    breakPoint: "(max-width: 600px)"
+});
+                </code>
+            </pre>
+            <!-- END CODE -->
+        </div>
+
+        <div class="pres">
+            <h3 class="title">Simple example on Y inverted direction</h3>
             <div class="img-container">
                 <img src="assets/test6.jpg" alt="Test" parallaxy-y parallaxy-inverted-y parallaxy-speed-y="0.12">
             </div>
@@ -239,7 +320,7 @@ new Parallaxy({
         </div>
 
         <div class="pres">
-            <h3>Simple example on Y with transition</h3>
+            <h3 class="title">Simple example on Y with transition</h3>
             <div class="img-container">
                 <img src="assets/test7.jpg" alt="Test" parallaxy-y style="transition: 0.6s ease">
             </div>
@@ -264,7 +345,15 @@ new Parallaxy({
         </div>
 
         <div class="thx">
-            <h2>Thank You !</h2>
+            <div>
+                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.1">T</h2>
+                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.3">h</h2>
+                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.2">a</h2>
+                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.5">n</h2>
+                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.4">k</h2>
+                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.2">s</h2>
+                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.3">!</h2>
+            </div>
         </div>
     </div>
 </body>
@@ -272,5 +361,10 @@ new Parallaxy({
 document.querySelectorAll("code.language-html").forEach(function(element) {
     element.innerHTML = element.innerHTML.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 });
+
+const l1 = document.querySelector('#line-1');
+for(let i=0; i<10; ++i){
+    l1.innerHTML += '<img src="assets/vuejs.png" alt="Test" parallaxy-x parallaxy-overflow-x parallaxy-speed-x="0.6" parallaxy-scale="1">';
+}
 </script>
 </html>
