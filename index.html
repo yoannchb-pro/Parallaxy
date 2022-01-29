@@ -67,6 +67,7 @@ const {Parallaxy, ParallaxyAttributes, ParallaxyDefaultconfig} = require("parall
     "parallaxy-x",
     "parallaxy-scale",
     "parallaxy-breakpoint",
+    "parallaxy-axes",
     "parallaxy-speed-x",
     "parallaxy-speed-y",
     "parallaxy-overflow-x",
@@ -76,7 +77,7 @@ const {Parallaxy, ParallaxyAttributes, ParallaxyDefaultconfig} = require("parall
 ]
                 </code>
             </pre>
-            <h3>JAVASCRIPT</h3>
+            <h3>JAVASCRIPT ATTRIBUTES</h3>
             <pre>
                 <code class="language-javascript">
 console.log(ParallaxyDefaultconfig, ParallaxyAttributes);
@@ -89,11 +90,12 @@ const parallaxy = new Parallaxy({
         overflow: false
     },
     'x':{
-        speed: 0,
+        speed: 0.2,
         invert: false,
         overflow: false
     },
-    breakPoint: "(max-width: 600px)", //Will stop parallax on mobile
+    axes: 200, //What is the axes of the parallax in px ? By default it's the middle screen
+    breakPoint: "(max-width: 600px)", //Will stop parallax on mobile for example (default is false)
     scale: 1.5 //Need to be >= 1
 });
 
@@ -222,7 +224,7 @@ new Parallaxy({
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-overflow-x parallaxy-x parallaxy-speed-x="0.5">
+<img src="assets/test.jpg" alt="Test" parallaxy-overflow-x parallaxy-x parallaxy-speed-x="0.65">
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -313,6 +315,31 @@ new Parallaxy({
         inverted: true,
         speed: 0.12
     }
+});
+                </code>
+            </pre>
+            <!-- END CODE -->
+        </div>
+
+
+        <div class="pres">
+            <h3 class="title">Simple example of axes</h3>
+            <div class="img-container">
+                <img src="assets/testa.jpg" alt="Test" parallaxy-y parallaxy-axes="100">
+            </div>
+            <!-- CODE -->
+            <h3>HTML</h3>
+            <pre>
+                <code class="language-html">
+<img src="assets/test.jpg" alt="Test" parallaxy-y parallaxy-axes="100">
+                </code>
+            </pre>
+            <h3>JAVASCRIPT</h3>
+            <pre>
+                <code class="language-javascript">
+new Parallaxy({
+    element: document.querySelectorAll('img'),
+    axes: 100,
 });
                 </code>
             </pre>

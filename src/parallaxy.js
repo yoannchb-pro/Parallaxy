@@ -19,6 +19,7 @@ const ParallaxyAttributes = [
     "parallaxy-y",
     "parallaxy-x",
     "parallaxy-scale",
+    "parallaxy-axes",
     "parallaxy-breakpoint",
     "parallaxy-speed-x",
     "parallaxy-speed-y",
@@ -55,8 +56,15 @@ class Parallaxy{
         if(config.x && !config.x.speed) config.x.speed = ParallaxyDefaultconfig.speed;
         if(config.y && !config.y.speed) config.y.speed = ParallaxyDefaultconfig.speed;
 
+        if(config.x && config.x.speed <= 0) throw "[Parallaxy] 'speed' need to be bigger than 0";
+        if(config.y && config.y.speed <= 0) throw "[Parallaxy] 'speed' need to be bigger than 0";
+        if(config.x && config.x.speed > 0.65) throw "[Parallaxy] 'speed' need to be smaller than 0.65";
+        if(config.y && config.y.speed > 0.65) throw "[Parallaxy] 'speed' need to be smaller than 0.65";
+
         if(config.scale < 1) throw "[Parallaxy] 'scale' need to be bigger than 1 (or equal but with overflow)";
         if(!config.scale) config.scale = ParallaxyDefaultconfig.scale;
+
+        if(!config.axes) config.axes = window.innerHeight/2;
 
         return config;
     }
@@ -106,6 +114,7 @@ class Parallaxy{
 
     isIntersectingObserver(element, translation = {x: 0, y: 0}){
         const height = window.innerHeight;
+        const additionalHeight = height/2;
     
         const rec = element.getBoundingClientRect();
 
@@ -120,8 +129,8 @@ class Parallaxy{
     
         let vIntersect = false;
     
-        let topCondition = pos.top >= 0 && pos.top <= height;
-        let bottomCondition = pos.bottom >= 0 && pos.bottom <= height;
+        let topCondition = pos.top >= -additionalHeight && pos.top <= height + additionalHeight;
+        let bottomCondition = pos.bottom >= -additionalHeight && pos.bottom <= height + additionalHeight;
     
         if(topCondition || bottomCondition || (pos.top < 0 && pos.bottom > height)) vIntersect = true;
     
@@ -212,7 +221,7 @@ class Parallaxy{
 
         const scaleSize = originalRect.additionalHeight/2;
         const elementCenterPosition = scaledRect.top + scaledRect.height/2;
-        const screenMiddleSize = window.innerHeight/2;
+        const screenMiddleSize = this.config.axes;
         const elementPositionFromTop =  screenMiddleSize - elementCenterPosition;
 
         let translation = elementPositionFromTop * speed;
@@ -235,7 +244,7 @@ class Parallaxy{
 
         const scaleSize = originalRect.additionalWidth/2;
         const elementCenterPosition = scaledRect.top + scaledRect.height/2;
-        const screenMiddleSize = window.innerHeight/2;
+        const screenMiddleSize = this.config.axes;
         const elementPositionFromTop =  screenMiddleSize - elementCenterPosition;
 
         let translation = elementPositionFromTop * speed;
@@ -306,6 +315,10 @@ function ParallaxyAttributesHandler(elements){
             //break point
             const breakPoint = el.getAttribute('parallaxy-breakpoint');
             if(breakPoint != null) config.breakPoint = breakPoint;
+
+            //axes
+            const axes = el.getAttribute('parallaxy-axes');
+            if(axes != null) config.axes = parseFloat(axes);
 
             new Parallaxy(config);
         }

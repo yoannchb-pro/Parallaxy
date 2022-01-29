@@ -24,7 +24,7 @@ if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
 } //ALL PARALLAXY ATTRIBUTES
 
 
-var ParallaxyAttributes = ["parallaxy-y", "parallaxy-x", "parallaxy-scale", "parallaxy-breakpoint", "parallaxy-speed-x", "parallaxy-speed-y", "parallaxy-overflow-x", "parallaxy-overflow-y", "parallaxy-inverted-x", "parallaxy-inverted-y"]; //DEFAULT CONFIG
+var ParallaxyAttributes = ["parallaxy-y", "parallaxy-x", "parallaxy-scale", "parallaxy-axes", "parallaxy-breakpoint", "parallaxy-speed-x", "parallaxy-speed-y", "parallaxy-overflow-x", "parallaxy-overflow-y", "parallaxy-inverted-x", "parallaxy-inverted-y"]; //DEFAULT CONFIG
 
 var ParallaxyDefaultconfig = {
   speed: 0.5,
@@ -53,8 +53,13 @@ var Parallaxy = /*#__PURE__*/function () {
       };
       if (config.x && !config.x.speed) config.x.speed = ParallaxyDefaultconfig.speed;
       if (config.y && !config.y.speed) config.y.speed = ParallaxyDefaultconfig.speed;
+      if (config.x && config.x.speed <= 0) throw "[Parallaxy] 'speed' need to be bigger than 0";
+      if (config.y && config.y.speed <= 0) throw "[Parallaxy] 'speed' need to be bigger than 0";
+      if (config.x && config.x.speed > 0.65) throw "[Parallaxy] 'speed' need to be smaller than 0.65";
+      if (config.y && config.y.speed > 0.65) throw "[Parallaxy] 'speed' need to be smaller than 0.65";
       if (config.scale < 1) throw "[Parallaxy] 'scale' need to be bigger than 1 (or equal but with overflow)";
       if (!config.scale) config.scale = ParallaxyDefaultconfig.scale;
+      if (!config.axes) config.axes = window.innerHeight / 2;
       return config;
     }
   }, {
@@ -113,6 +118,7 @@ var Parallaxy = /*#__PURE__*/function () {
         y: 0
       };
       var height = window.innerHeight;
+      var additionalHeight = height / 2;
       var rec = element.getBoundingClientRect(); //Because rec is only in read mode
 
       var pos = {
@@ -122,8 +128,8 @@ var Parallaxy = /*#__PURE__*/function () {
       pos.top = pos.top + translation.y;
       pos.bottom = pos.bottom + translation.y;
       var vIntersect = false;
-      var topCondition = pos.top >= 0 && pos.top <= height;
-      var bottomCondition = pos.bottom >= 0 && pos.bottom <= height;
+      var topCondition = pos.top >= -additionalHeight && pos.top <= height + additionalHeight;
+      var bottomCondition = pos.bottom >= -additionalHeight && pos.bottom <= height + additionalHeight;
       if (topCondition || bottomCondition || pos.top < 0 && pos.bottom > height) vIntersect = true;
       if (vIntersect) return true;
       return false;
@@ -212,7 +218,7 @@ var Parallaxy = /*#__PURE__*/function () {
       var originalRect = this.originalRect(el);
       var scaleSize = originalRect.additionalHeight / 2;
       var elementCenterPosition = scaledRect.top + scaledRect.height / 2;
-      var screenMiddleSize = window.innerHeight / 2;
+      var screenMiddleSize = this.config.axes;
       var elementPositionFromTop = screenMiddleSize - elementCenterPosition;
       var translation = elementPositionFromTop * speed;
       if (isInverted) translation = -translation; //*(speed/4)
@@ -234,7 +240,7 @@ var Parallaxy = /*#__PURE__*/function () {
       var originalRect = this.originalRect(el);
       var scaleSize = originalRect.additionalWidth / 2;
       var elementCenterPosition = scaledRect.top + scaledRect.height / 2;
-      var screenMiddleSize = window.innerHeight / 2;
+      var screenMiddleSize = this.config.axes;
       var elementPositionFromTop = screenMiddleSize - elementCenterPosition;
       var translation = elementPositionFromTop * speed;
       if (isInverted) translation = -translation; //*(speed/4)
@@ -300,7 +306,10 @@ function ParallaxyAttributesHandler(elements) {
       if (scale != null) config.scale = parseFloat(scale); //break point
 
       var breakPoint = el.getAttribute('parallaxy-breakpoint');
-      if (breakPoint != null) config.breakPoint = breakPoint;
+      if (breakPoint != null) config.breakPoint = breakPoint; //axes
+
+      var axes = el.getAttribute('parallaxy-axes');
+      if (axes != null) config.axes = parseFloat(axes);
       new Parallaxy(config);
     }
   });

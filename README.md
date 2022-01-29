@@ -6,6 +6,11 @@ Create beautiful images parallax with attributes or in javascript for your websi
 
 ## Update
 
+v1.0.4
+- Fixed bug for intersecting ellement on y
+- Added `axes` parameter (parallaxy-axes)
+- Added speed limit (0 < speed < 0.66)
+
 v1.0.3
 - Fixed bug for parallaxy x when the element go out of the screen
 
