@@ -24,11 +24,12 @@ if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
 } //ALL PARALLAXY ATTRIBUTES
 
 
-var ParallaxyAttributes = ["parallaxy-y", "parallaxy-x", "parallaxy-scale", "parallaxy-axes", "parallaxy-breakpoint", "parallaxy-speed-x", "parallaxy-speed-y", "parallaxy-overflow-x", "parallaxy-overflow-y", "parallaxy-inverted-x", "parallaxy-inverted-y"]; //DEFAULT CONFIG
+var ParallaxyAttributes = ["parallaxy-y", "parallaxy-x", "parallaxy-scale", "parallaxy-axes", "parallaxy-adaptative", "parallaxy-breakpoint", "parallaxy-speed-x", "parallaxy-speed-y", "parallaxy-overflow-x", "parallaxy-overflow-y", "parallaxy-inverted-x", "parallaxy-inverted-y"]; //DEFAULT CONFIG
 
 var ParallaxyDefaultconfig = {
   speed: 0.5,
-  scale: 1.5
+  scale: 1.5,
+  adaptative: 1
 }; //PARALLAXY MAIN CLASS
 
 var Parallaxy = /*#__PURE__*/function () {
@@ -60,6 +61,24 @@ var Parallaxy = /*#__PURE__*/function () {
       if (config.scale < 1) throw "[Parallaxy] 'scale' need to be bigger than 1 (or equal but with overflow)";
       if (!config.scale) config.scale = ParallaxyDefaultconfig.scale;
       if (!config.axes) config.axes = window.innerHeight / 2;
+
+      if (config.adaptative) {
+        var nb = parseInt(config.adaptative);
+
+        if (nb) {
+          if (nb <= 0) throw "[Parallaxy] parallaxy adaptative number must be > 0";
+          config.adaptative = {
+            type: "number",
+            value: nb
+          };
+        } else {
+          config.adaptative = {
+            type: "query",
+            value: config.adaptative
+          };
+        }
+      }
+
       return config;
     }
   }, {
@@ -70,6 +89,7 @@ var Parallaxy = /*#__PURE__*/function () {
       this.$el.forEach(function (el) {
         el.addEventListener('load', obj.updatePosition.bind(obj));
       });
+      if (this.config.adaptative) this.adaptativeImageHandler();
       this.updatePosition();
     }
   }, {
@@ -98,6 +118,57 @@ var Parallaxy = /*#__PURE__*/function () {
     value: function reset() {
       this.$el.forEach(function (el) {
         el.style.transform = "";
+      });
+    }
+  }, {
+    key: "adaptativeImageHandler",
+    value: function adaptativeImageHandler() {
+      var config = this.config.adaptative;
+      var type = config.type;
+      var value = config.value;
+
+      function getParent(element) {
+        var parent = element; //SETING UP PARENT OF ELEMENT
+
+        if (type == "query") {
+          parent = document.querySelector(value);
+        } else {
+          for (var i = 0; i < value; ++i) {
+            parent = parent.parentNode;
+          }
+        }
+
+        return parent;
+      }
+
+      function adaptation(_ref) {
+        var parent = _ref.parent,
+            element = _ref.element;
+
+        function setWidth() {
+          element.style.width = "100%";
+          element.style.height = "auto";
+        }
+
+        function setHeight() {
+          element.style.height = "100%";
+          element.style.width = "auto";
+        }
+
+        var imageAspectRatio = element.clientWidth / element.clientHeight,
+            parentAspectRatio = parent.clientWidth / parent.clientHeight;
+        if (imageAspectRatio > parentAspectRatio) setHeight();else setWidth();
+      }
+
+      this.$el.forEach(function (element) {
+        var parent = getParent(element);
+        var fn = adaptation.bind(this, {
+          parent: parent,
+          element: element
+        });
+        new ResizeObserver(fn).observe(parent); //INITIALISING SIZE
+
+        fn();
       });
     }
   }, {
@@ -187,6 +258,10 @@ var Parallaxy = /*#__PURE__*/function () {
     value: function originalRect(el) {
       var rec = el.getBoundingClientRect();
       var scale = this.config.scale;
+      var top = rec.top;
+      var left = rec.left;
+      var right = rec.right;
+      var bottom = rec.bottom;
       var width = rec.width / scale;
       var height = rec.height / scale;
       var additionalHeight = rec.height - height;
@@ -194,6 +269,10 @@ var Parallaxy = /*#__PURE__*/function () {
       return {
         width: width,
         height: height,
+        top: top,
+        left: left,
+        right: right,
+        bottom: bottom,
         additionalHeight: additionalHeight,
         additionalWidth: additionalWidth
       };
@@ -309,7 +388,10 @@ function ParallaxyAttributesHandler(elements) {
       if (breakPoint != null) config.breakPoint = breakPoint; //axes
 
       var axes = el.getAttribute('parallaxy-axes');
-      if (axes != null) config.axes = parseFloat(axes);
+      if (axes != null) config.axes = parseFloat(axes); //adaptative
+
+      var adaptative = el.getAttribute('parallaxy-adaptative');
+      if (adaptative != null) config.adaptative = adaptative.trim() == "" ? ParallaxyDefaultconfig.adaptative : adaptative;
       new Parallaxy(config);
     }
   });

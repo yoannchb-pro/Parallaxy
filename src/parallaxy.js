@@ -20,6 +20,7 @@ const ParallaxyAttributes = [
     "parallaxy-x",
     "parallaxy-scale",
     "parallaxy-axes",
+    "parallaxy-adaptative",
     "parallaxy-breakpoint",
     "parallaxy-speed-x",
     "parallaxy-speed-y",
@@ -33,6 +34,7 @@ const ParallaxyAttributes = [
 const ParallaxyDefaultconfig = {
     speed: 0.5,
     scale: 1.5,
+    adaptative: 1
 }
 
 //PARALLAXY MAIN CLASS
@@ -66,6 +68,17 @@ class Parallaxy{
 
         if(!config.axes) config.axes = window.innerHeight/2;
 
+        if(config.adaptative) {
+            const nb = parseInt(config.adaptative);
+            if(nb){
+                if(nb <= 0) throw "[Parallaxy] parallaxy adaptative number must be > 0";
+
+                config.adaptative = {type: "number", value: nb};
+            } else {
+                config.adaptative = {type: "query", value: config.adaptative};
+            }
+        }
+
         return config;
     }
 
@@ -74,8 +87,10 @@ class Parallaxy{
 
         const obj = this;
         this.$el.forEach(function(el){
-            el.addEventListener('load', obj.updatePosition.bind(obj))
+            el.addEventListener('load', obj.updatePosition.bind(obj));
         });
+
+        if(this.config.adaptative) this.adaptativeImageHandler();
 
         this.updatePosition();
     }
@@ -101,6 +116,53 @@ class Parallaxy{
     reset(){
         this.$el.forEach(function(el){
             el.style.transform = "";
+        });
+    }
+
+    adaptativeImageHandler(){
+        const config = this.config.adaptative;
+        const type = config.type;
+        const value = config.value;
+
+        function getParent(element){
+            let parent = element;
+
+            //SETING UP PARENT OF ELEMENT
+            if(type == "query"){
+                parent = document.querySelector(value);
+            } else {
+                for(let i=0; i<value; ++i){
+                    parent = parent.parentNode;
+                }
+            }
+
+            return parent;
+        }
+
+        function adaptation({parent, element}){
+            function setWidth(){
+                element.style.width = "100%";
+                element.style.height = "auto";
+            }
+    
+            function setHeight(){
+                element.style.height = "100%";
+                element.style.width = "auto";
+            }
+
+            const imageAspectRatio = element.clientWidth / element.clientHeight,
+                  parentAspectRatio = parent.clientWidth / parent.clientHeight
+                      
+            if(imageAspectRatio > parentAspectRatio) setHeight(); else setWidth();
+        }
+
+        this.$el.forEach(function(element){
+            const parent = getParent(element);
+            const fn = adaptation.bind(this, {parent: parent, element: element});
+            new ResizeObserver(fn).observe(parent);
+
+            //INITIALISING SIZE
+            fn();
         });
     }
 
@@ -189,6 +251,11 @@ class Parallaxy{
         const rec = el.getBoundingClientRect();
         const scale = this.config.scale;
 
+        const top = rec.top;
+        const left = rec.left;
+        const right = rec.right;
+        const bottom = rec.bottom;
+
         const width = rec.width / scale;
         const height = rec.height / scale;
 
@@ -198,6 +265,10 @@ class Parallaxy{
         return {
             width,
             height,
+            top,
+            left,
+            right,
+            bottom,
             additionalHeight,
             additionalWidth
         }
@@ -319,6 +390,10 @@ function ParallaxyAttributesHandler(elements){
             //axes
             const axes = el.getAttribute('parallaxy-axes');
             if(axes != null) config.axes = parseFloat(axes);
+
+            //adaptative
+            const adaptative = el.getAttribute('parallaxy-adaptative');
+            if(adaptative != null) config.adaptative = adaptative.trim() == "" ? ParallaxyDefaultconfig.adaptative : adaptative;
 
             new Parallaxy(config);
         }

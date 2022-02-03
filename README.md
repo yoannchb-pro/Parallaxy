@@ -6,6 +6,9 @@ Create beautiful images parallax with attributes or in javascript for your websi
 
 ## Update
 
+v1.0.5
+- Added `adaptative` parameter (parallaxy-adaptative)
+
 v1.0.4
 - Fixed bug for intersecting ellement on y
 - Added `axes` parameter (parallaxy-axes)
@@ -30,6 +33,11 @@ npm i parallaxy-img
 ```
 ```js
 const {Parallaxy, ParallaxyAttributes, ParallaxyDefaultconfig} = require("parallaxy-img");
+
+
+//Vue.js
+import parallaxy from "parallaxy-img/dist/parallaxy.js";
+Vue.use(parallaxy);
 ```
 
 ## CDN

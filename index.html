@@ -44,6 +44,10 @@ npm i parallaxy-img
             <pre>
                 <code class="language-javascript">
 const {Parallaxy, ParallaxyAttributes, ParallaxyDefaultconfig} = require("parallaxy-img");
+
+//Vue.js
+import parallaxy from "parallaxy-img/dist/parallaxy.js";
+Vue.use(parallaxy);
                 </code>
             </pre>
             <h3>CDN</h3>
@@ -67,6 +71,7 @@ const {Parallaxy, ParallaxyAttributes, ParallaxyDefaultconfig} = require("parall
     "parallaxy-x",
     "parallaxy-scale",
     "parallaxy-breakpoint",
+    "parallaxy-adaptative",
     "parallaxy-axes",
     "parallaxy-speed-x",
     "parallaxy-speed-y",
@@ -94,6 +99,7 @@ const parallaxy = new Parallaxy({
         invert: false,
         overflow: false
     },
+    adaptative: false, //Adapte the image to the container size (type -> query or number of parent to go up)
     axes: 200, //What is the axes of the parallax in px ? By default it's the middle screen
     breakPoint: "(max-width: 600px)", //Will stop parallax on mobile for example (default is false)
     scale: 1.5 //Need to be >= 1
@@ -236,6 +242,33 @@ new Parallaxy({
         speed: 0.5,
         overflow: true
     }
+});
+                </code>
+            </pre>
+            <!-- END CODE -->
+        </div>
+
+        <div class="pres">
+            <h3 class="title">Simple example of image adaptation (resize it)</h3>
+            <div class="img-container" style="resize: both; overflow: hidden">
+                <img src="assets/testad.jpg" alt="Test" parallaxy-y 
+                parallaxy-adaptative>
+            </div>
+            <!-- CODE -->
+            <h3>HTML</h3>
+            <pre>
+                <code class="language-html">
+<div id="parent-container">
+    <img src="assets/test.jpg" alt="Test" parallaxy-y parallaxy-adaptative>
+</div>
+                </code>
+            </pre>
+            <h3>JAVASCRIPT</h3>
+            <pre>
+                <code class="language-javascript">
+new Parallaxy({
+    element: document.querySelectorAll('img'),
+    adaptive: 1
 });
                 </code>
             </pre>
