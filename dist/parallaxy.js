@@ -42,6 +42,8 @@ var Parallaxy = /*#__PURE__*/function () {
     this.$el.forEach(function (el) {
       el.style.willChange = "transform";
     });
+    this.instances = [];
+    this.mainEvent = null;
     this.start();
   }
 
@@ -84,7 +86,8 @@ var Parallaxy = /*#__PURE__*/function () {
   }, {
     key: "start",
     value: function start() {
-      document.addEventListener("scroll", this.updatePosition.bind(this));
+      this.mainEvent = this.updatePosition.bind(this);
+      document.addEventListener("scroll", this.mainEvent);
       var obj = this;
       this.$el.forEach(function (el) {
         el.addEventListener('load', obj.updatePosition.bind(obj));
@@ -95,12 +98,26 @@ var Parallaxy = /*#__PURE__*/function () {
   }, {
     key: "stop",
     value: function stop() {
-      document.removeEventListener("scroll", this.updatePosition.bind(this));
+      document.removeEventListener("scroll", this.mainEvent);
+      this.instances.forEach(function (e) {
+        document.removeEventListener('resize', e.fn);
+        e.obs.unobserve(e.parent);
+      });
     }
   }, {
     key: "removeElement",
     value: function removeElement(el) {
       this.$el.splice(this.$el.indexOf(el), 1);
+      var filtered = this.instances.filter(function (e) {
+        e.element == el;
+      });
+
+      if (filtered && filtered.length > 0) {
+        filtered.forEach(function (e) {
+          document.removeEventListener("resize", e.fn);
+          e.obs.unobserve(e.parent);
+        });
+      }
 
       if (this.$el.length == 0) {
         this.stop();
@@ -126,6 +143,7 @@ var Parallaxy = /*#__PURE__*/function () {
       var config = this.config.adaptative;
       var type = config.type;
       var value = config.value;
+      var obj = this;
 
       function getParent(element) {
         var parent = element; //SETING UP PARENT OF ELEMENT
@@ -180,18 +198,28 @@ var Parallaxy = /*#__PURE__*/function () {
 
             backSize.width = p.clientWidth;
             backSize.height = p.clientHeight;
-            window.requestAnimationFrame(loop.bind(null, p, c));
           }
 
+          var inter = null;
           return {
             observe: function observe(lookAt) {
-              loop(lookAt, callback);
+              inter = setInterval(loop.bind(null, lookAt, callback), 1000 / 30); //30 fps
+            },
+            unobserve: function unobserve() {
+              clearInterval(inter);
             }
           };
         };
 
-        new ResizeObserverObj(fn).observe(parent);
-        document.addEventListener('resize', fn); //INITIALISING SIZE
+        var obsResize = new ResizeObserverObj(fn);
+        obsResize.observe(parent);
+        document.addEventListener('resize', fn);
+        obj.instances.push({
+          element: element,
+          parent: parent,
+          fn: fn,
+          obs: obsResize
+        }); //INITIALISING SIZE
 
         fn();
       });
@@ -249,6 +277,7 @@ var Parallaxy = /*#__PURE__*/function () {
       var breaking = this.matchingBreakingPoint();
       var obj = this;
       if (!breaking) this.$el.forEach(function (el) {
+        if (!el.isConnected) obj.removeElement(el);
         var valid = obj.verifyParallaxy.bind(obj, el)();
         var intersecting = obj.isIntersectingObserver(el);
 

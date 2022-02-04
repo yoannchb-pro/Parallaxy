@@ -47,6 +47,9 @@ class Parallaxy{
         this.$el = this.config.element[0] ? this.config.element : [this.config.element];
         this.$el.forEach(function(el){ el.style.willChange = "transform"});
 
+        this.instances = [];
+        this.mainEvent = null;
+
         this.start();
     }
 
@@ -83,7 +86,8 @@ class Parallaxy{
     }
 
     start(){
-        document.addEventListener("scroll", this.updatePosition.bind(this));
+        this.mainEvent = this.updatePosition.bind(this);
+        document.addEventListener("scroll", this.mainEvent);
 
         const obj = this;
         this.$el.forEach(function(el){
@@ -96,11 +100,26 @@ class Parallaxy{
     }
 
     stop(){
-        document.removeEventListener("scroll", this.updatePosition.bind(this));
+        document.removeEventListener("scroll", this.mainEvent);
+
+        this.instances.forEach(function(e){
+            document.removeEventListener('resize', e.fn);
+            e.obs.unobserve(e.parent);
+        });
     }
 
     removeElement(el){
         this.$el.splice(this.$el.indexOf(el),1);
+
+        const filtered = this.instances.filter(function(e) { e.element == el });
+
+        if(filtered && filtered.length > 0){
+            filtered.forEach(function(e){
+                document.removeEventListener("resize", e.fn);
+                e.obs.unobserve(e.parent);
+            });
+        }
+
         if(this.$el.length == 0){
             this.stop();
         }
@@ -123,6 +142,8 @@ class Parallaxy{
         const config = this.config.adaptative;
         const type = config.type;
         const value = config.value;
+
+        const obj = this;
 
         function getParent(element){
             let parent = element;
@@ -173,19 +194,30 @@ class Parallaxy{
 
                     backSize.width = p.clientWidth;
                     backSize.height = p.clientHeight;
-
-                    window.requestAnimationFrame(loop.bind(null, p, c));
                 }
+
+                let inter = null;
 
                 return {
                     observe: function(lookAt){
-                        loop(lookAt, callback);
+                        inter = setInterval(loop.bind(null, lookAt, callback), 1000 / 30); //30 fps
+                    },
+                    unobserve: function(){
+                        clearInterval(inter);
                     }
                 }
             }
 
-            new ResizeObserverObj(fn).observe(parent);
+            const obsResize = new ResizeObserverObj(fn);
+            obsResize.observe(parent);
             document.addEventListener('resize', fn);
+
+            obj.instances.push({
+                element: element,
+                parent: parent,
+                fn: fn,
+                obs: obsResize
+            });
 
             //INITIALISING SIZE
             fn();
@@ -246,6 +278,8 @@ class Parallaxy{
         const obj = this;
         
         if(!breaking) this.$el.forEach(function(el){
+            if(!el.isConnected) obj.removeElement(el);
+
             const valid = obj.verifyParallaxy.bind(obj, el)();
             const intersecting = obj.isIntersectingObserver(el);
 

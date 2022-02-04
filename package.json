@@ -1,6 +1,6 @@
 {
   "name": "parallaxy-img",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Create beautiful parallax with attributes and javascript",
   "main": "./dist/parallaxy.js",
   "scripts": {
