@@ -159,7 +159,33 @@ class Parallaxy{
         this.$el.forEach(function(element){
             const parent = getParent(element);
             const fn = adaptation.bind(this, {parent: parent, element: element});
-            new ResizeObserver(fn).observe(parent);
+
+            const ResizeObserverObj = window.ResizeObserver || function(callback){
+                let backSize = {
+                    width: 0,
+                    height: 0
+                }
+
+                function loop(p, c){
+                    if(p.clientWidth != backSize.width || p.clientHeight != backSize.height){
+                        c();
+                    }
+
+                    backSize.width = p.clientWidth;
+                    backSize.height = p.clientHeight;
+
+                    window.requestAnimationFrame(loop.bind(null, p, c));
+                }
+
+                return {
+                    observe: function(lookAt){
+                        loop(lookAt, callback);
+                    }
+                }
+            }
+
+            new ResizeObserverObj(fn).observe(parent);
+            document.addEventListener('resize', fn);
 
             //INITIALISING SIZE
             fn();
@@ -332,7 +358,9 @@ class Parallaxy{
 
 //HANDLER ATTRIBUTE
 function ParallaxyAttributesHandler(elements){
-    elements.forEach(function(el){
+    let elementsParallaxy = document.querySelectorAll('[parallaxy-y], [parallaxy-x]');
+
+    elementsParallaxy.forEach(function(el){
         if(!el.getAttribute) return;
 
         const x = el.getAttribute("parallaxy-x") != null;
@@ -429,7 +457,9 @@ function ParallaxyObserver(){
                 }
             }
 
-            if(addedNodes && addedNodes.length > 0) ParallaxyAttributesHandler(addedNodes);
+            if(addedNodes && addedNodes.length > 0) {
+                ParallaxyAttributesHandler(addedNodes);
+            }
         })
     });
 

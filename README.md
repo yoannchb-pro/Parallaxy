@@ -6,6 +6,10 @@ Create beautiful images parallax with attributes or in javascript for your websi
 
 ## Update
 
+v1.0.6
+- Fixed observer
+- Fixed parallaxy-adaptative on window resize
+
 v1.0.5
 - Added `adaptative` parameter (parallaxy-adaptative)
 

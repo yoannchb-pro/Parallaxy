@@ -166,7 +166,32 @@ var Parallaxy = /*#__PURE__*/function () {
           parent: parent,
           element: element
         });
-        new ResizeObserver(fn).observe(parent); //INITIALISING SIZE
+
+        var ResizeObserverObj = window.ResizeObserver || function (callback) {
+          var backSize = {
+            width: 0,
+            height: 0
+          };
+
+          function loop(p, c) {
+            if (p.clientWidth != backSize.width || p.clientHeight != backSize.height) {
+              c();
+            }
+
+            backSize.width = p.clientWidth;
+            backSize.height = p.clientHeight;
+            window.requestAnimationFrame(loop.bind(null, p, c));
+          }
+
+          return {
+            observe: function observe(lookAt) {
+              loop(lookAt, callback);
+            }
+          };
+        };
+
+        new ResizeObserverObj(fn).observe(parent);
+        document.addEventListener('resize', fn); //INITIALISING SIZE
 
         fn();
       });
@@ -339,7 +364,8 @@ var Parallaxy = /*#__PURE__*/function () {
 
 
 function ParallaxyAttributesHandler(elements) {
-  elements.forEach(function (el) {
+  var elementsParallaxy = document.querySelectorAll('[parallaxy-y], [parallaxy-x]');
+  elementsParallaxy.forEach(function (el) {
     if (!el.getAttribute) return;
     var x = el.getAttribute("parallaxy-x") != null;
     var y = el.getAttribute("parallaxy-y") != null;
@@ -421,7 +447,9 @@ function ParallaxyObserver() {
         }
       }
 
-      if (addedNodes && addedNodes.length > 0) ParallaxyAttributesHandler(addedNodes);
+      if (addedNodes && addedNodes.length > 0) {
+        ParallaxyAttributesHandler(addedNodes);
+      }
     });
   });
   observerDOM.observe(window.document.documentElement, {
