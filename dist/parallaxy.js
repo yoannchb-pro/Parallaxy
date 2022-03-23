@@ -1,6 +1,12 @@
-"use strict";
+'use strict'; //all actual parrallaxy elements
 
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -8,13 +14,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-/**
- * Parallaxy.js
- * Create beautiful parallax with attributes or in javascript
- * v1.0.0
- * https://github.com/yoannchb-pro/Parallaxy
- */
-//For each for IE
+var ParallaxyElements = []; //For each for IE
+
 if (window.NodeList && !NodeList.prototype.forEach) {
   NodeList.prototype.forEach = Array.prototype.forEach;
 }
@@ -50,6 +51,7 @@ var Parallaxy = /*#__PURE__*/function () {
   _createClass(Parallaxy, [{
     key: "verfiyConfiguration",
     value: function verfiyConfiguration(config) {
+      this.windowHeight = window.innerHeight;
       if (!config.element) throw "[Parallaxy] 'element' must be specified when you create a new Parallaxy object";
       if (!config.x && !config.y) config.y = {
         speed: ParallaxyDefaultconfig.speed
@@ -62,7 +64,7 @@ var Parallaxy = /*#__PURE__*/function () {
       if (config.y && config.y.speed > 0.65) throw "[Parallaxy] 'speed' need to be smaller than 0.65";
       if (config.scale < 1) throw "[Parallaxy] 'scale' need to be bigger than 1 (or equal but with overflow)";
       if (!config.scale) config.scale = ParallaxyDefaultconfig.scale;
-      if (!config.axes) config.axes = window.innerHeight / 2;
+      if (!config.axes) config.axes = this.windowHeight / 2;
 
       if (config.adaptative) {
         var nb = parseInt(config.adaptative);
@@ -87,20 +89,28 @@ var Parallaxy = /*#__PURE__*/function () {
     key: "start",
     value: function start() {
       this.mainEvent = this.updatePosition.bind(this);
-      document.addEventListener("scroll", this.mainEvent);
       var obj = this;
       this.$el.forEach(function (el) {
-        el.addEventListener('load', obj.updatePosition.bind(obj));
+        el.addEventListener('load', function () {
+          obj.updatePosition.bind(obj)();
+        });
       });
       if (this.config.adaptative) this.adaptativeImageHandler();
+      document.addEventListener("scroll", this.mainEvent, {
+        passive: true
+      });
       this.updatePosition();
     }
   }, {
     key: "stop",
     value: function stop() {
-      document.removeEventListener("scroll", this.mainEvent);
+      document.removeEventListener("scroll", this.mainEvent, {
+        passive: true
+      });
       this.instances.forEach(function (e) {
-        document.removeEventListener('resize', e.fn);
+        document.removeEventListener('resize', e.fn, {
+          passive: true
+        });
         e.obs.unobserve(e.parent);
       });
     }
@@ -108,13 +118,16 @@ var Parallaxy = /*#__PURE__*/function () {
     key: "removeElement",
     value: function removeElement(el) {
       this.$el.splice(this.$el.indexOf(el), 1);
+      ParallaxyElements.splice(ParallaxyElements.indexOf(el), 1);
       var filtered = this.instances.filter(function (e) {
         e.element == el;
       });
 
       if (filtered && filtered.length > 0) {
         filtered.forEach(function (e) {
-          document.removeEventListener("resize", e.fn);
+          document.removeEventListener("resize", e.fn, {
+            passive: true
+          });
           e.obs.unobserve(e.parent);
         });
       }
@@ -213,7 +226,9 @@ var Parallaxy = /*#__PURE__*/function () {
 
         var obsResize = new ResizeObserverObj(fn);
         obsResize.observe(parent);
-        document.addEventListener('resize', fn);
+        document.addEventListener('resize', fn, {
+          passive: true
+        });
         obj.instances.push({
           element: element,
           parent: parent,
@@ -236,14 +251,13 @@ var Parallaxy = /*#__PURE__*/function () {
     }
   }, {
     key: "isIntersectingObserver",
-    value: function isIntersectingObserver(element) {
-      var translation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    value: function isIntersectingObserver(element, rec) {
+      var translation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {
         x: 0,
         y: 0
       };
-      var height = window.innerHeight;
-      var additionalHeight = height / 2;
-      var rec = element.getBoundingClientRect(); //Because rec is only in read mode
+      var height = this.windowHeight;
+      var additionalHeight = height / 2; //Because rec is only in read mode
 
       var pos = {
         top: rec.top,
@@ -276,41 +290,61 @@ var Parallaxy = /*#__PURE__*/function () {
     value: function updatePosition() {
       var breaking = this.matchingBreakingPoint();
       var obj = this;
-      if (!breaking) this.$el.forEach(function (el) {
-        if (!el.isConnected) obj.removeElement(el);
-        var valid = obj.verifyParallaxy.bind(obj, el)();
-        var intersecting = obj.isIntersectingObserver(el);
 
-        if (valid && intersecting) {
-          var transform = [];
-          transform.push(obj.scale());
-          var translation = {
-            x: 0,
-            y: 0
-          };
+      if (!breaking) {
+        var _iterator = _createForOfIteratorHelper(this.$el),
+            _step;
 
-          if (obj.config.y) {
-            var transY = obj.translateY(el);
-            translation.y = transY;
-            transform.push("translateY(".concat(transY, "px)"));
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var el = _step.value;
+
+            if (!el.isConnected) {
+              obj.removeElement(el);
+              continue;
+            }
+
+            var rec = el.getBoundingClientRect();
+            var valid = obj.verifyParallaxy.bind(obj, el)();
+            var intersecting = obj.isIntersectingObserver(el, rec);
+
+            if (valid && intersecting) {
+              var transform = [];
+              transform.push(obj.scale());
+              var translation = {
+                x: 0,
+                y: 0
+              };
+
+              if (obj.config.y) {
+                var transY = obj.translateY(rec);
+                translation.y = transY;
+                transform.push("translateY(".concat(transY, "px)"));
+              }
+
+              if (obj.config.x) {
+                var transX = obj.translateX(rec);
+                translation.x = transX;
+                transform.push("translateX(".concat(transX, "px)"));
+              }
+
+              el.style.transform = transform.join(' ');
+            }
+
+            ;
           }
-
-          if (obj.config.x) {
-            var transX = obj.translateX(el);
-            translation.x = transX;
-            transform.push("translateX(".concat(transX, "px)"));
-          }
-
-          el.style.transform = transform.join(' ');
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
         }
+      }
 
-        ;
-      });
+      ;
     }
   }, {
     key: "originalRect",
-    value: function originalRect(el) {
-      var rec = el.getBoundingClientRect();
+    value: function originalRect(rec) {
       var scale = this.config.scale;
       var top = rec.top;
       var left = rec.left;
@@ -332,23 +366,17 @@ var Parallaxy = /*#__PURE__*/function () {
       };
     }
   }, {
-    key: "scaledRect",
-    value: function scaledRect(el) {
-      var rec = el.getBoundingClientRect();
-      return rec;
-    }
-  }, {
     key: "scale",
     value: function scale() {
       return "scale(".concat(this.config.scale, ")");
     }
   }, {
     key: "translateY",
-    value: function translateY(el) {
+    value: function translateY(rec) {
       var speed = this.config.y.speed;
       var isInverted = this.config.y.inverted;
-      var scaledRect = this.scaledRect(el);
-      var originalRect = this.originalRect(el);
+      var scaledRect = rec;
+      var originalRect = this.originalRect(rec);
       var scaleSize = originalRect.additionalHeight / 2;
       var elementCenterPosition = scaledRect.top + scaledRect.height / 2;
       var screenMiddleSize = this.config.axes;
@@ -366,11 +394,11 @@ var Parallaxy = /*#__PURE__*/function () {
     }
   }, {
     key: "translateX",
-    value: function translateX(el) {
+    value: function translateX(rec) {
       var speed = this.config.x.speed;
       var isInverted = this.config.x.inverted;
-      var scaledRect = this.scaledRect(el);
-      var originalRect = this.originalRect(el);
+      var scaledRect = rec;
+      var originalRect = this.originalRect(rec);
       var scaleSize = originalRect.additionalWidth / 2;
       var elementCenterPosition = scaledRect.top + scaledRect.height / 2;
       var screenMiddleSize = this.config.axes;
@@ -392,10 +420,14 @@ var Parallaxy = /*#__PURE__*/function () {
 }(); //HANDLER ATTRIBUTE
 
 
-function ParallaxyAttributesHandler(elements) {
+function ParallaxyAttributesHandler() {
   var elementsParallaxy = document.querySelectorAll('[parallaxy-y], [parallaxy-x]');
   elementsParallaxy.forEach(function (el) {
-    if (!el.getAttribute) return;
+    if (ParallaxyElements.indexOf(el) != -1 || !el.getAttribute) {
+      return;
+    }
+
+    ParallaxyElements.push(el);
     var x = el.getAttribute("parallaxy-x") != null;
     var y = el.getAttribute("parallaxy-y") != null;
 
@@ -461,25 +493,7 @@ function ParallaxyObserver() {
   var MutationObserver = getMutationObserver();
   var observerDOM = new MutationObserver(function (mutations) {
     if (!mutations) return;
-    mutations.forEach(function (mutation) {
-      var addedNodes = Array.prototype.slice.call(mutation.addedNodes);
-      var removedNodes = Array.prototype.slice.call(mutation.removedNodes);
-      var attr = mutation.attributeName;
-
-      if (attr && attr.indexOf('parallaxy') != -1) {
-        var el = mutation.target;
-
-        if (el.getAttribute('parallaxy-x') != null || el.getAttribute('parallaxy-y') != null) {
-          addedNodes.push(el);
-        } else {
-          removedNodes.push(el);
-        }
-      }
-
-      if (addedNodes && addedNodes.length > 0) {
-        ParallaxyAttributesHandler(addedNodes);
-      }
-    });
+    ParallaxyAttributesHandler();
   });
   observerDOM.observe(window.document.documentElement, {
     childList: true,

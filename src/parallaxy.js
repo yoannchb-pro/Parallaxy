@@ -1,9 +1,7 @@
-/**
- * Parallaxy.js
- * Create beautiful parallax with attributes or in javascript
- * v1.0.0
- * https://github.com/yoannchb-pro/Parallaxy
- */
+'use strict';
+
+//all actual parrallaxy elements
+const ParallaxyElements = [];
 
 //For each for IE
 if(window.NodeList && !NodeList.prototype.forEach) {
@@ -54,6 +52,8 @@ class Parallaxy{
     }
 
     verfiyConfiguration(config){
+        this.windowHeight = window.innerHeight;
+
         if(!config.element) throw "[Parallaxy] 'element' must be specified when you create a new Parallaxy object";
 
         if(!config.x && !config.y) config.y = {speed: ParallaxyDefaultconfig.speed};
@@ -69,7 +69,7 @@ class Parallaxy{
         if(config.scale < 1) throw "[Parallaxy] 'scale' need to be bigger than 1 (or equal but with overflow)";
         if(!config.scale) config.scale = ParallaxyDefaultconfig.scale;
 
-        if(!config.axes) config.axes = window.innerHeight/2;
+        if(!config.axes) config.axes = this.windowHeight/2;
 
         if(config.adaptative) {
             const nb = parseInt(config.adaptative);
@@ -87,35 +87,40 @@ class Parallaxy{
 
     start(){
         this.mainEvent = this.updatePosition.bind(this);
-        document.addEventListener("scroll", this.mainEvent);
 
         const obj = this;
+
         this.$el.forEach(function(el){
-            el.addEventListener('load', obj.updatePosition.bind(obj));
+            el.addEventListener('load', function(){
+                obj.updatePosition.bind(obj)();
+            });
         });
 
         if(this.config.adaptative) this.adaptativeImageHandler();
+
+        document.addEventListener("scroll", this.mainEvent, {passive: true});
 
         this.updatePosition();
     }
 
     stop(){
-        document.removeEventListener("scroll", this.mainEvent);
+        document.removeEventListener("scroll", this.mainEvent, {passive: true});
 
         this.instances.forEach(function(e){
-            document.removeEventListener('resize', e.fn);
+            document.removeEventListener('resize', e.fn, {passive: true});
             e.obs.unobserve(e.parent);
         });
     }
 
     removeElement(el){
         this.$el.splice(this.$el.indexOf(el),1);
+        ParallaxyElements.splice(ParallaxyElements.indexOf(el),1);
 
         const filtered = this.instances.filter(function(e) { e.element == el });
 
         if(filtered && filtered.length > 0){
             filtered.forEach(function(e){
-                document.removeEventListener("resize", e.fn);
+                document.removeEventListener("resize", e.fn, {passive: true});
                 e.obs.unobserve(e.parent);
             });
         }
@@ -210,7 +215,7 @@ class Parallaxy{
 
             const obsResize = new ResizeObserverObj(fn);
             obsResize.observe(parent);
-            document.addEventListener('resize', fn);
+            document.addEventListener('resize', fn, {passive: true});
 
             obj.instances.push({
                 element: element,
@@ -232,11 +237,9 @@ class Parallaxy{
         return true;
     }
 
-    isIntersectingObserver(element, translation = {x: 0, y: 0}){
-        const height = window.innerHeight;
+    isIntersectingObserver(element, rec, translation = {x: 0, y: 0}){
+        const height = this.windowHeight;
         const additionalHeight = height/2;
-    
-        const rec = element.getBoundingClientRect();
 
         //Because rec is only in read mode
         const pos = {
@@ -276,12 +279,17 @@ class Parallaxy{
         const breaking = this.matchingBreakingPoint();
 
         const obj = this;
-        
-        if(!breaking) this.$el.forEach(function(el){
-            if(!el.isConnected) obj.removeElement(el);
+
+        if(!breaking) for(const el of this.$el){
+            if(!el.isConnected) {
+                obj.removeElement(el);
+                continue;
+            }
+
+            const rec = el.getBoundingClientRect();
 
             const valid = obj.verifyParallaxy.bind(obj, el)();
-            const intersecting = obj.isIntersectingObserver(el);
+            const intersecting = obj.isIntersectingObserver(el, rec);
 
             if(valid && intersecting){
                 const transform = [];
@@ -291,24 +299,23 @@ class Parallaxy{
                 let translation = {x: 0, y: 0};
 
                 if(obj.config.y) {
-                    const transY = obj.translateY(el);
+                    const transY = obj.translateY(rec);
                     translation.y = transY;
                     transform.push(`translateY(${transY}px)`);
                 }
 
                 if(obj.config.x) {
-                    const transX = obj.translateX(el);
+                    const transX = obj.translateX(rec);
                     translation.x = transX;
                     transform.push(`translateX(${transX}px)`);
                 }
         
                 el.style.transform = transform.join(' ');
             };
-        });
+        };
     }
 
-    originalRect(el){
-        const rec = el.getBoundingClientRect();
+    originalRect(rec){
         const scale = this.config.scale;
 
         const top = rec.top;
@@ -334,21 +341,16 @@ class Parallaxy{
         }
     }
 
-    scaledRect(el){
-        const rec = el.getBoundingClientRect();
-        return rec;
-    }
-
     scale(){
         return `scale(${this.config.scale})`;
     }
 
-    translateY(el){
+    translateY(rec){
         const speed = this.config.y.speed;
         const isInverted = this.config.y.inverted;
 
-        const scaledRect = this.scaledRect(el);
-        const originalRect = this.originalRect(el);
+        const scaledRect = rec;
+        const originalRect = this.originalRect(rec);
 
         const scaleSize = originalRect.additionalHeight/2;
         const elementCenterPosition = scaledRect.top + scaledRect.height/2;
@@ -366,12 +368,12 @@ class Parallaxy{
         return translation;
     }
 
-    translateX(el){
+    translateX(rec){
         const speed = this.config.x.speed;
         const isInverted = this.config.x.inverted;
 
-        const scaledRect = this.scaledRect(el);
-        const originalRect = this.originalRect(el);
+        const scaledRect = rec;
+        const originalRect = this.originalRect(rec);
 
         const scaleSize = originalRect.additionalWidth/2;
         const elementCenterPosition = scaledRect.top + scaledRect.height/2;
@@ -391,11 +393,15 @@ class Parallaxy{
 }
 
 //HANDLER ATTRIBUTE
-function ParallaxyAttributesHandler(elements){
+function ParallaxyAttributesHandler(){
     let elementsParallaxy = document.querySelectorAll('[parallaxy-y], [parallaxy-x]');
 
     elementsParallaxy.forEach(function(el){
-        if(!el.getAttribute) return;
+        if(ParallaxyElements.indexOf(el) != -1 || !el.getAttribute) {
+            return;
+        }
+
+        ParallaxyElements.push(el);
 
         const x = el.getAttribute("parallaxy-x") != null;
         const y = el.getAttribute("parallaxy-y") != null;
@@ -477,24 +483,7 @@ function ParallaxyObserver(){
     const observerDOM = new MutationObserver(function(mutations){
         if (!mutations) return;
 
-        mutations.forEach(function(mutation){ 
-            const addedNodes = Array.prototype.slice.call(mutation.addedNodes);
-            const removedNodes = Array.prototype.slice.call(mutation.removedNodes);
-
-            const attr = mutation.attributeName;
-            if(attr && attr.indexOf('parallaxy') != -1) {
-                const el = mutation.target;
-                if(el.getAttribute('parallaxy-x') != null || el.getAttribute('parallaxy-y') != null){
-                    addedNodes.push(el);
-                } else {
-                    removedNodes.push(el);
-                }
-            }
-
-            if(addedNodes && addedNodes.length > 0) {
-                ParallaxyAttributesHandler(addedNodes);
-            }
-        })
+        ParallaxyAttributesHandler();
     });
 
     observerDOM.observe(window.document.documentElement, {

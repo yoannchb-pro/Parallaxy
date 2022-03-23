@@ -5,6 +5,10 @@ Create beautiful images parallax with attributes or in javascript for your websi
 <img src="./assets/Animation.gif" alt="GIF ANIMATION"></img>
 
 ## Update
+v1.0.8
+- Improvement
+- Remove event listener fixed
+
 v1.0.7
 - Correctly stop observing
 - No more working for IE
