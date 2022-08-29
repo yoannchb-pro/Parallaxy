@@ -41,25 +41,18 @@
 npm i parallaxy-img
                 </code>
             </pre>
-            <pre>
-                <code class="language-javascript">
-const {Parallaxy, ParallaxyAttributes, ParallaxyDefaultconfig} = require("parallaxy-img");
-
-//Vue.js
-import parallaxy from "parallaxy-img/dist/parallaxy.js";
-Vue.use(parallaxy);
-                </code>
-            </pre>
             <h3>CDN</h3>
             <pre>
                 <code class="language-html">
-<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/yoannchb-pro/Parallaxy/dist/parallaxy.min.js"></script>
+https://cdn.jsdelivr.net/gh/yoannchb-pro/Parallaxy/dist/parallaxy.min.js
                 </code>
             </pre>
-            <h3>GITHUB</h3>
+            <h3>Import</h3>
             <pre>
-                <code class="language-html">
-<script type="text/javascript" src="./dist/parallaxy.js"></script>
+                <code class="language-javascript">
+const Parallaxy = require("parallaxy-img");
+import Parallaxy from "parallaxy-img";
+import "parallaxy-img";
                 </code>
             </pre>
             <h3 class="title">How to use ?</h3>
@@ -67,26 +60,24 @@ Vue.use(parallaxy);
             <pre>
                 <code class="language-javascript">
 [
-    "parallaxy-y",
-    "parallaxy-x",
-    "parallaxy-scale",
-    "parallaxy-breakpoint",
-    "parallaxy-adaptative",
-    "parallaxy-axes",
-    "parallaxy-speed-x",
-    "parallaxy-speed-y",
-    "parallaxy-overflow-x",
-    "parallaxy-overflow-y",
-    "parallaxy-inverted-x",
-    "parallaxy-inverted-y",
+    "data-prl-y",
+    "data-prl-x",
+    "data-prl-scale",
+    "data-prl-breakpoint",
+    "data-prl-adaptative",
+    "data-prl-axes",
+    "data-prl-speed-x",
+    "data-prl-speed-y",
+    "data-prl-overflow-x",
+    "data-prl-overflow-y",
+    "data-prl-inverted-x",
+    "data-prl-inverted-y",
 ]
                 </code>
             </pre>
-            <h3>JAVASCRIPT ATTRIBUTES</h3>
+            <h3>Without attributes in JS</h3>
             <pre>
                 <code class="language-javascript">
-console.log(ParallaxyDefaultconfig, ParallaxyAttributes);
-
 const parallaxy = new Parallaxy({
     element: ...,
     'y': {
@@ -107,9 +98,19 @@ const parallaxy = new Parallaxy({
 
 parallaxy.addElement(...); //Add element to parallaxy configuration
 parallaxy.removeElement(...); //Remove element from parallaxy configuration
-parallaxy.start(); //Auto start is always actived
+parallaxy.start(); //Start parallaxy (actived by default)
 parallaxy.stop(); //Stop parallaxy
 parallaxy.reset(); //To remove transformation of each elements after stop
+                </code>
+            </pre>
+            <h3>Important ! You need to center the image into the container</h3>
+            <pre>
+                <code class="language-css">
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
                 </code>
             </pre>
         </div>
@@ -117,13 +118,13 @@ parallaxy.reset(); //To remove transformation of each elements after stop
         <div class="pres">
             <h3 class="title">Simple example on Y</h3>
             <div class="img-container">
-                <img src="assets/test.jpg" alt="Test" parallaxy-y>
+                <img src="assets/test.jpg" alt="Test" data-prl-y data-prl-scale="1.8" data-prl-overflow-y=""> 
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-y>
+<img src="..." data-prl-y data-prl-scale="1.8" data-prl-overflow-y>
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -140,13 +141,13 @@ new Parallaxy({
         <div class="pres">
             <h3 class="title">Simple example on X</h3>
             <div class="img-container">
-                <img src="assets/test2.jpg" alt="Test" parallaxy-x parallaxy-speed-x="0.1">
+                <img src="assets/test2.jpg" alt="Test" data-prl-x data-prl-speed-x="0.1">
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-x parallaxy-speed-x="0.1">
+<img src="..." data-prl-x data-prl-speed-x="0.1">
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -171,25 +172,22 @@ new Parallaxy({
             <h3>CSS</h3>
             <pre>
                 <code class="language-css" style="text-align: left">
-.line-container{
-    width: auto;
-    margin-left: -20rem;
-    padding: 1rem;
-    height: 10rem;
-    white-space: nowrap;
-    overflow: hidden;
+.line-container {
+  display: flex;
+  margin-left: -20rem;
+  white-space: nowrap;
+  overflow: hidden;
 }
-                    
-.line-container img{
-    display: inline-block;
-    width: 10rem;
+
+.line-container img {
+  width: 10rem;
 }
                 </code>
             </pre>
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/vuejs.png" alt="Test" parallaxy-x parallaxy-overflow-x parallaxy-speed-x="0.6" parallaxy-scale="1">
+<img src="assets/vuejs.png" alt="Test" data-prl-x data-prl-overflow-x data-prl-speed-x="0.6" data-prl-scale="1">
                 </code>
             </pre>
         </div>
@@ -197,13 +195,13 @@ new Parallaxy({
         <div class="pres">
             <h3 class="title">Simple example on X and Y</h3>
             <div class="img-container">
-                <img src="assets/test3.jpg" alt="Test" parallaxy-y parallaxy-x parallaxy-speed-x="0.2">
+                <img src="assets/test3.jpg" alt="Test" data-prl-y data-prl-overflow-y data-prl-x data-prl-overflow-x data-prl-speed-x="0.2">
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-y parallaxy-x parallaxy-speed-x="0.2">
+<img src="..." data-prl-y data-prl-overflow-y data-prl-x data-prl-overflow-x data-prl-speed-x="0.2">
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -224,13 +222,13 @@ new Parallaxy({
         <div class="pres">
             <h3 class="title">Simple example on X with overflow</h3>
             <div class="img-container">
-                <img src="assets/test4.jpg" alt="Test" parallaxy-overflow-x parallaxy-x parallaxy-speed-x="0.5">
+                <img src="assets/test4.jpg" alt="Test" data-prl-overflow-x data-prl-x data-prl-speed-x="0.5">
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-overflow-x parallaxy-x parallaxy-speed-x="0.65">
+<img src="..." data-prl-overflow-x data-prl-x data-prl-speed-x="0.65">
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -251,15 +249,15 @@ new Parallaxy({
         <div class="pres">
             <h3 class="title">Simple example of image adaptation (resize it)</h3>
             <div class="img-container" style="resize: both; overflow: hidden">
-                <img src="assets/testad.jpg" alt="Test" parallaxy-y 
-                parallaxy-adaptative>
+                <img src="assets/testad.jpg" alt="Test" data-prl-y 
+                data-prl-adaptative>
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
 <div id="parent-container">
-    <img src="assets/test.jpg" alt="Test" parallaxy-y parallaxy-adaptative>
+    <img src="..." data-prl-y data-prl-adaptative>
 </div>
                 </code>
             </pre>
@@ -278,13 +276,13 @@ new Parallaxy({
         <div class="pres">
             <h3 class="title">Simple example on X inverted direction</h3>
             <div class="img-container">
-                <img src="assets/test5.jpg" alt="Test" parallaxy-x parallaxy-inverted-x parallaxy-speed-x="0.2">
+                <img src="assets/test5.jpg" alt="Test" data-prl-x data-prl-inverted-x data-prl-speed-x="0.2">
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-x parallaxy-inverted-x parallaxy-speed-x="0.2">
+<img src="..." data-prl-x data-prl-inverted-x data-prl-speed-x="0.2">
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -306,13 +304,13 @@ new Parallaxy({
         <div class="pres">
             <h3 class="title">Simple example of Parallaxy breakPoint</h3>
             <div class="img-container">
-                <img src="assets/testb.jpg" alt="Test" parallaxy-y parallaxy-breakpoint="(max-width: 600px)">
+                <img src="assets/testb.jpg" alt="Test" data-prl-y data-prl-breakpoint="(max-width: 600px)">
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-y parallaxy-breakpoint="(max-width: 600px)">
+<img src="..." data-prl-y data-prl-breakpoint="(max-width: 600px)">
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -330,13 +328,13 @@ new Parallaxy({
         <div class="pres">
             <h3 class="title">Simple example on Y inverted direction</h3>
             <div class="img-container">
-                <img src="assets/test6.jpg" alt="Test" parallaxy-y parallaxy-inverted-y parallaxy-speed-y="0.12">
+                <img src="assets/test6.jpg" alt="Test" data-prl-y data-prl-inverted-y data-prl-speed-y="0.12">
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-y parallaxy-inverted-y parallaxy-speed-y="0.12">
+<img src="..." data-prl-y data-prl-inverted-y data-prl-speed-y="0.12">
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -358,13 +356,13 @@ new Parallaxy({
         <div class="pres">
             <h3 class="title">Simple example of axes</h3>
             <div class="img-container">
-                <img src="assets/testa.jpg" alt="Test" parallaxy-y parallaxy-axes="100">
+                <img src="assets/testa.jpg" alt="Test" data-prl-y data-prl-axes="100">
             </div>
             <!-- CODE -->
             <h3>HTML</h3>
             <pre>
                 <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-y parallaxy-axes="100">
+<img src="..." data-prl-y data-prl-axes="100">
                 </code>
             </pre>
             <h3>JAVASCRIPT</h3>
@@ -379,40 +377,15 @@ new Parallaxy({
             <!-- END CODE -->
         </div>
 
-        <div class="pres">
-            <h3 class="title">Simple example on Y with transition</h3>
-            <div class="img-container">
-                <img src="assets/test7.jpg" alt="Test" parallaxy-y style="transition: 0.6s ease">
-            </div>
-            <!-- CODE -->
-            <h3>HTML</h3>
-            <pre>
-                <code class="language-html">
-<img src="assets/test.jpg" alt="Test" parallaxy-y style="transition: 0.6s ease">
-                </code>
-            </pre>
-            <h3>JAVASCRIPT</h3>
-            <pre>
-                <code class="language-javascript">
-document.querySelectorAll('img').forEach(function(e){ e.style.transition = '0.6s ease'});
-
-new Parallaxy({
-    element: document.querySelectorAll('img'),
-});
-                </code>
-            </pre>
-            <!-- END CODE -->
-        </div>
-
         <div class="thx">
             <div>
-                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.1">T</h2>
-                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.3">h</h2>
-                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.2">a</h2>
-                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.5">n</h2>
-                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.4">k</h2>
-                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.2">s</h2>
-                <h2 parallaxy-y parallaxy-overflow-y parallaxy-scale="1" parallaxy-speed-y="0.3">!</h2>
+                <h2 data-prl-y data-prl-overflow-y data-prl-scale="1" data-prl-speed-y="0.1">T</h2>
+                <h2 data-prl-y data-prl-overflow-y data-prl-scale="1" data-prl-speed-y="0.3">h</h2>
+                <h2 data-prl-y data-prl-overflow-y data-prl-scale="1" data-prl-speed-y="0.2">a</h2>
+                <h2 data-prl-y data-prl-overflow-y data-prl-scale="1" data-prl-speed-y="0.5">n</h2>
+                <h2 data-prl-y data-prl-overflow-y data-prl-scale="1" data-prl-speed-y="0.4">k</h2>
+                <h2 data-prl-y data-prl-overflow-y data-prl-scale="1" data-prl-speed-y="0.2">s</h2>
+                <h2 data-prl-y data-prl-overflow-y data-prl-scale="1" data-prl-speed-y="0.3">!</h2>
             </div>
         </div>
     </div>
@@ -424,7 +397,7 @@ document.querySelectorAll("code.language-html").forEach(function(element) {
 
 const l1 = document.querySelector('#line-1');
 for(let i=0; i<10; ++i){
-    l1.innerHTML += '<img src="assets/vuejs.png" alt="Test" parallaxy-x parallaxy-overflow-x parallaxy-speed-x="0.6" parallaxy-scale="1">';
+    l1.innerHTML += '<img src="assets/vuejs.png" alt="Test" data-prl-x data-prl-overflow-x data-prl-speed-x="0.6" data-prl-scale="1">';
 }
 </script>
 </html>

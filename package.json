@@ -1,11 +1,11 @@
 {
   "name": "parallaxy-img",
-  "version": "1.0.8",
-  "description": "Create beautiful parallax with attributes and javascript",
+  "version": "1.0.9",
+  "description": "Create beautiful parallax with attributes or in javascript",
   "main": "./dist/parallaxy.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/babel src --out-dir dist"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,8 @@
   "devDependencies": {
     "@babel/cli": "^7.16.8",
     "@babel/core": "^7.16.12",
-    "@babel/preset-env": "^7.16.11"
+    "@babel/preset-env": "^7.16.11",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^22.0.2"
   }
 }
