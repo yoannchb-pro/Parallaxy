@@ -44,7 +44,7 @@ npm i parallaxy-img
             <h3>CDN</h3>
             <pre>
                 <code class="language-html">
-https://cdn.jsdelivr.net/gh/yoannchb-pro/Parallaxy/dist/parallaxy.min.js
+https://unpkg.com/parallaxy-img@1.1.0/dist/parallaxy.js
                 </code>
             </pre>
             <h3>Import</h3>
@@ -55,26 +55,7 @@ import Parallaxy from "parallaxy-img";
 import "parallaxy-img";
                 </code>
             </pre>
-            <h3 class="title">How to use ?</h3>
-            <h3>HTML ATTRIBUTES</h3>
-            <pre>
-                <code class="language-javascript">
-[
-    "data-prl-y",
-    "data-prl-x",
-    "data-prl-scale",
-    "data-prl-breakpoint",
-    "data-prl-adaptative",
-    "data-prl-axes",
-    "data-prl-speed-x",
-    "data-prl-speed-y",
-    "data-prl-overflow-x",
-    "data-prl-overflow-y",
-    "data-prl-inverted-x",
-    "data-prl-inverted-y",
-]
-                </code>
-            </pre>
+            
             <h3>Without attributes in JS</h3>
             <pre>
                 <code class="language-javascript">
@@ -90,7 +71,6 @@ const parallaxy = new Parallaxy({
         invert: false,
         overflow: false
     },
-    adaptative: false, //Adapte the image to the container size (type -> query or number of parent to go up)
     axes: 200, //What is the axes of the parallax in px ? By default it's the middle screen
     breakPoint: "(max-width: 600px)", //Will stop parallax on mobile for example (default is false)
     scale: 1.5 //Need to be >= 1
@@ -103,7 +83,7 @@ parallaxy.stop(); //Stop parallaxy
 parallaxy.reset(); //To remove transformation of each elements after stop
                 </code>
             </pre>
-            <h3>Important ! You need to center the image into the container</h3>
+            <h3>Dont forget to center the image into the container</h3>
             <pre>
                 <code class="language-css">
 .container{
@@ -240,33 +220,6 @@ new Parallaxy({
         speed: 0.5,
         overflow: true
     }
-});
-                </code>
-            </pre>
-            <!-- END CODE -->
-        </div>
-
-        <div class="pres">
-            <h3 class="title">Simple example of image adaptation (resize it)</h3>
-            <div class="img-container" style="resize: both; overflow: hidden">
-                <img src="assets/testad.jpg" alt="Test" data-prl-y 
-                data-prl-adaptative>
-            </div>
-            <!-- CODE -->
-            <h3>HTML</h3>
-            <pre>
-                <code class="language-html">
-<div id="parent-container">
-    <img src="..." data-prl-y data-prl-adaptative>
-</div>
-                </code>
-            </pre>
-            <h3>JAVASCRIPT</h3>
-            <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelectorAll('img'),
-    adaptive: 1
 });
                 </code>
             </pre>

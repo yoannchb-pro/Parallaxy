@@ -1,16 +1,15 @@
 "use strict";
 
-//all actual parrallaxy elements
+//All actual parrallaxy elements
 const ParallaxyElements = [];
 
-//DEFAULT CONFIG
+//Default config
 const ParallaxyDefaultconfig = {
   speed: 0.5,
   scale: 1.5,
-  adaptative: 1,
 };
 
-//PARALLAXY MAIN CLASS
+//Parallaxy handler
 class Parallaxy {
   constructor(config) {
     config = this.verfiyConfiguration(config);
@@ -20,11 +19,11 @@ class Parallaxy {
     this.$el = this.config.element[0]
       ? this.config.element
       : [this.config.element];
-    this.$el.forEach(function (el) {
-      el.style.willChange = "transform";
-    });
 
-    this.instances = [];
+    for (const el of this.$el) {
+      el.style.willChange = "transform";
+    }
+
     this.mainEvent = null;
 
     this.start();
@@ -59,62 +58,30 @@ class Parallaxy {
 
     if (!config.axes) config.axes = this.windowHeight / 2;
 
-    if (config.adaptative) {
-      const nb = parseInt(config.adaptative);
-      if (nb) {
-        if (nb <= 0)
-          throw "[Parallaxy] parallaxy adaptative number must be > 0";
-
-        config.adaptative = { type: "number", value: nb };
-      } else {
-        config.adaptative = { type: "query", value: config.adaptative };
-      }
-    }
-
     return config;
   }
 
   start() {
     this.mainEvent = this.updatePosition.bind(this);
 
-    const obj = this;
-
-    this.$el.forEach(function (el) {
-      el.addEventListener("load", function () {
-        obj.updatePosition.bind(obj)();
+    for (const el of this.$el) {
+      el.addEventListener("load", () => {
+        this.updatePosition();
       });
-    });
+    }
 
-    if (this.config.adaptative) this.adaptativeImageHandler();
-
-    document.addEventListener("scroll", this.mainEvent, { passive: true });
+    document.addEventListener("scroll", this.mainEvent);
 
     this.updatePosition();
   }
 
   stop() {
-    document.removeEventListener("scroll", this.mainEvent, { passive: true });
-
-    this.instances.forEach(function (e) {
-      document.removeEventListener("resize", e.fn, { passive: true });
-      e.obs.unobserve(e.parent);
-    });
+    document.removeEventListener("scroll", this.mainEvent);
   }
 
   removeElement(el) {
     this.$el.splice(this.$el.indexOf(el), 1);
     ParallaxyElements.splice(ParallaxyElements.indexOf(el), 1);
-
-    const filtered = this.instances.filter(function (e) {
-      e.element == el;
-    });
-
-    if (filtered && filtered.length > 0) {
-      filtered.forEach(function (e) {
-        document.removeEventListener("resize", e.fn, { passive: true });
-        e.obs.unobserve(e.parent);
-      });
-    }
 
     if (this.$el.length == 0) {
       this.stop();
@@ -123,107 +90,16 @@ class Parallaxy {
 
   adddElement(el) {
     this.$el.push(el);
+    ParallaxyElements.push(el);
 
     this.stop();
     this.start();
   }
 
   reset() {
-    this.$el.forEach(function (el) {
+    for (const el of this.$el) {
       el.style.transform = "";
-    });
-  }
-
-  adaptativeImageHandler() {
-    const config = this.config.adaptative;
-    const type = config.type;
-    const value = config.value;
-
-    const obj = this;
-
-    function getParent(element) {
-      let parent = element;
-
-      //SETING UP PARENT OF ELEMENT
-      if (type == "query") {
-        parent = document.querySelector(value);
-      } else {
-        for (let i = 0; i < value; ++i) {
-          parent = parent.parentNode;
-        }
-      }
-
-      return parent;
     }
-
-    function adaptation({ parent, element }) {
-      function setWidth() {
-        element.style.width = "100%";
-        element.style.height = "auto";
-      }
-
-      function setHeight() {
-        element.style.height = "100%";
-        element.style.width = "auto";
-      }
-
-      const imageAspectRatio = element.clientWidth / element.clientHeight,
-        parentAspectRatio = parent.clientWidth / parent.clientHeight;
-
-      if (imageAspectRatio > parentAspectRatio) setHeight();
-      else setWidth();
-    }
-
-    this.$el.forEach(function (element) {
-      const parent = getParent(element);
-      const fn = adaptation.bind(this, { parent: parent, element: element });
-
-      const ResizeObserverObj =
-        window.ResizeObserver ||
-        function (callback) {
-          let backSize = {
-            width: 0,
-            height: 0,
-          };
-
-          function loop(p, c) {
-            if (
-              p.clientWidth != backSize.width ||
-              p.clientHeight != backSize.height
-            ) {
-              c();
-            }
-
-            backSize.width = p.clientWidth;
-            backSize.height = p.clientHeight;
-          }
-
-          let inter = null;
-
-          return {
-            observe: function (lookAt) {
-              inter = setInterval(loop.bind(null, lookAt, callback), 1000 / 30); //30 fps
-            },
-            unobserve: function () {
-              clearInterval(inter);
-            },
-          };
-        };
-
-      const obsResize = new ResizeObserverObj(fn);
-      obsResize.observe(parent);
-      document.addEventListener("resize", fn, { passive: true });
-
-      obj.instances.push({
-        element: element,
-        parent: parent,
-        fn: fn,
-        obs: obsResize,
-      });
-
-      //INITIALISING SIZE
-      fn();
-    });
   }
 
   verifyParallaxy(el) {
@@ -235,7 +111,20 @@ class Parallaxy {
     return true;
   }
 
-  isIntersectingObserver(element, rec, translation = { x: 0, y: 0 }) {
+  matchingBreakingPoint() {
+    const breakingPoint = this.config.breakPoint;
+
+    if (!breakingPoint) return false;
+
+    if (window.matchMedia(breakingPoint).matches) {
+      this.reset();
+      return true;
+    }
+
+    return false;
+  }
+
+  isIntersectingObserver(rec, marge = 50) {
     const height = this.windowHeight;
     const additionalHeight = height / 2;
 
@@ -245,8 +134,8 @@ class Parallaxy {
       bottom: rec.bottom,
     };
 
-    pos.top = pos.top + translation.y;
-    pos.bottom = pos.bottom + translation.y;
+    pos.top = pos.top - marge;
+    pos.bottom = pos.bottom + marge;
 
     let vIntersect = false;
 
@@ -264,51 +153,36 @@ class Parallaxy {
     return false;
   }
 
-  matchingBreakingPoint() {
-    const breakingPoint = this.config.breakPoint;
-
-    if (!breakingPoint) return false;
-
-    if (window.matchMedia(breakingPoint).matches) {
-      this.reset();
-      return true;
-    }
-
-    return false;
-  }
-
   updatePosition() {
     const breaking = this.matchingBreakingPoint();
-
-    const obj = this;
 
     if (!breaking)
       for (const el of this.$el) {
         if (!el.isConnected) {
-          obj.removeElement(el);
+          this.removeElement(el);
           continue;
         }
 
         const rec = el.getBoundingClientRect();
 
-        const valid = obj.verifyParallaxy.bind(obj, el)();
-        const intersecting = obj.isIntersectingObserver(el, rec);
+        const valid = this.verifyParallaxy(el);
+        const intersecting = this.isIntersectingObserver(rec);
 
         if (valid && intersecting) {
           const transform = [];
 
-          transform.push(obj.scale());
+          transform.push(this.scale());
 
           let translation = { x: 0, y: 0 };
 
-          if (obj.config.y) {
-            const transY = obj.translateY(rec);
+          if (this.config.y) {
+            const transY = this.translateY(rec);
             translation.y = transY;
             transform.push(`translateY(${transY}px)`);
           }
 
-          if (obj.config.x) {
-            const transX = obj.translateX(rec);
+          if (this.config.x) {
+            const transX = this.translateX(rec);
             translation.x = transX;
             transform.push(`translateX(${transX}px)`);
           }
@@ -395,13 +269,13 @@ class Parallaxy {
   }
 }
 
-//HANDLER ATTRIBUTE
+//Attributes handler
 function ParallaxyAttributesHandler() {
   let elementsParallaxy = document.querySelectorAll(
     "[data-prl-y], [data-prl-x]"
   );
 
-  elementsParallaxy.forEach(function (el) {
+  for (const el of elementsParallaxy) {
     if (ParallaxyElements.indexOf(el) != -1 || !el.getAttribute) {
       return;
     }
@@ -466,20 +340,12 @@ function ParallaxyAttributesHandler() {
       const axes = gC.prlAxes;
       if (axes != null) config.axes = parseFloat(axes);
 
-      //adaptative
-      const adaptative = gC.prlAdaptative;
-      if (adaptative != null)
-        config.adaptative =
-          adaptative.trim() == ""
-            ? ParallaxyDefaultconfig.adaptative
-            : adaptative;
-
       new Parallaxy(config);
     }
-  });
+  }
 }
 
-//OBSERVER
+//Observer
 function ParallaxyObserver() {
   function getMutationObserver() {
     return (
@@ -505,7 +371,7 @@ function ParallaxyObserver() {
   });
 }
 
-//DOM LOADED
+//Dom loaded
 document.addEventListener("DOMContentLoaded", function () {
   ParallaxyObserver();
 
@@ -514,5 +380,4 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 });
 
-//EXPORT
 export default Parallaxy;

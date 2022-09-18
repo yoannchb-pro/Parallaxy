@@ -1,3 +1,10 @@
+v1.1.0
+
+- Removed parallaxy image adaptation
+- Minimified file
+- Fixed bugs
+- Improvement
+
 v1.0.9
 
 - Improvement
