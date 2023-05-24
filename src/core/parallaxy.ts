@@ -12,7 +12,7 @@ const ParallaxyDefaultconfig = {
 class Parallaxy {
   private frameId: number;
 
-  constructor(private element: HTMLElement, private config: Config) {
+  constructor(private element: HTMLElement, private config: Config = {}) {
     if (!element)
       throw "[Parallaxy] 'element' must be specified when you create a new Parallaxy object";
 
@@ -59,7 +59,7 @@ class Parallaxy {
    * Update the config on attribute change
    * @param config
    */
-  updateConfig(config?: Config) {
+  updateConfig(config: Config = {}) {
     const newConfig = this.verfiyConfiguration(
       config ?? getConfigFromAttributes(this.element)
     );

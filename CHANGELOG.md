@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v3.0.1
+
+- Fixed constructor
+
 ## v3.0.0
 
 - Fixed glitched effect
