@@ -1,8 +1,7 @@
 import { findParallaxyElementIndex, parseBooleanAttribute } from "../utils";
-import ParallaxyAttributesHandler from "./attr-handler";
+import { ParallaxyAttributesHandler } from "./attr-handler";
 import { ParallaxyElements } from "./parallaxy";
 
-//Observer
 function ParallaxyObserver() {
   const observerDOM = new MutationObserver(function (mutations) {
     const addedNodes: HTMLElement[] = [];

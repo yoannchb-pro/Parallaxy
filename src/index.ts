@@ -1,4 +1,4 @@
-import ParallaxyAttributesHandler from "core/attr-handler";
+import { ParallaxyAttributesHandler } from "core/attr-handler";
 import ParallaxyObserver from "core/observer";
 import { Parallaxy } from "core/parallaxy";
 

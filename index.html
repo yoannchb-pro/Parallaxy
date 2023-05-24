@@ -54,14 +54,17 @@ npm i parallaxy-img
         <h3>CDN</h3>
         <pre>
                 <code class="language-html">
-https://unpkg.com/parallaxy-img@2.0.0/dist/parallaxy.js
+https://unpkg.com/parallaxy-img@3.0.0/dist/parallaxy.js
                 </code>
             </pre>
         <h3>Import</h3>
         <pre>
                 <code class="language-javascript">
+//Importing the class
 const Parallaxy = require("parallaxy-img");
 import Parallaxy from "parallaxy-img";
+
+//Work with only attributes (vue.js, react, angular...)
 import "parallaxy-img";
                 </code>
             </pre>
@@ -71,23 +74,23 @@ import "parallaxy-img";
                 <code class="language-javascript">
 const parallaxy = new Parallaxy(element, {
     'y': {
-        speed: 0.5,
+        speed: 0.5, //speed in pourcentage by default it's 0.3
         invert: false,
         overflow: false
     },
     'x':{
-        speed: 0.2,
+        speed: 0.2, //speed in pourcentage by default it's 0.3
         invert: false,
         overflow: false
     },
-    axes: 200, //What is the axes of the parallax in px ? By default it's the middle screen
+    axes: 0.5, //Axes of the parallax (by default it's the middle screen)
     breakPoint: "(max-width: 600px)", //Will stop parallax on mobile for example (default is false)
     scale: 1.5 //Need to be >= 1
 });
 
 parallaxy.start(); //Start parallaxy (actived by default)
 parallaxy.stop(); //Stop parallaxy
-parallaxy.reset(); //To remove transformation of each elements after stop
+parallaxy.updateConfig(config); //To update the config of the parallax
                 </code>
             </pre>
         <h3>Dont forget to center the image into the container</h3>
@@ -286,14 +289,14 @@ parallaxy.reset(); //To remove transformation of each elements after stop
             src="assets/testa.jpg"
             alt="Test"
             data-prl-y
-            data-prl-axes="100"
+            data-prl-axes="0"
           />
         </div>
         <!-- CODE -->
         <h3>HTML</h3>
         <pre>
                 <code class="language-html">
-<img src="..." data-prl-y data-prl-axes="100">
+<img src="..." data-prl-y data-prl-axes="0">
                 </code>
             </pre>
         <!-- END CODE -->

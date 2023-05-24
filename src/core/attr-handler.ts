@@ -56,4 +56,4 @@ function ParallaxyAttributesHandler(elementsParallaxy: HTMLElement[]) {
   }
 }
 
-export default ParallaxyAttributesHandler;
+export { ParallaxyAttributesHandler, getConfigFromAttributes };
