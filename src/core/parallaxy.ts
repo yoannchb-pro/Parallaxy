@@ -55,6 +55,7 @@ class Parallaxy {
     return config;
   }
 
+  //TODO
   updateConfig() {}
 
   private matchingBreakingPoint() {
