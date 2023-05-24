@@ -44,6 +44,7 @@
               config.axes = this.windowHeight / 2;
           return config;
       }
+      //TODO
       updateConfig() { }
       matchingBreakingPoint() {
           const breakingPoint = this.config.breakPoint;
@@ -101,12 +102,14 @@
               return;
           const transform = [];
           transform.push(this.scale());
+          let translation = { x: 0, y: 0 };
           if (this.config.y) {
-              transform.push(`translateY(${this.translateY(scaledRect)}px)`);
+              translation.y = this.translateY(scaledRect);
           }
           if (this.config.x) {
-              transform.push(`translateX(${this.translateX(scaledRect)}px)`);
+              translation.x = this.translateX(scaledRect);
           }
+          transform.push(`translate3d(${translation.x}px, ${translation.y}px, 0px)`);
           this.element.style.transform = transform.join(" ");
       }
       originalRect(scaledRect) {

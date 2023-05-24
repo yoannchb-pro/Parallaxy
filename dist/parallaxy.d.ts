@@ -20,6 +20,7 @@ declare class Parallaxy {
     private windowHeight;
     constructor(element: HTMLElement, config: Config);
     private verfiyConfiguration;
+    //TODO
     updateConfig(): void;
     private matchingBreakingPoint;
     start(): void;
