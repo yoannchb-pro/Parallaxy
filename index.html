@@ -69,8 +69,7 @@ import "parallaxy-img";
         <h3>Without attributes in JS</h3>
         <pre>
                 <code class="language-javascript">
-const parallaxy = new Parallaxy({
-    element: ..., //one element only
+const parallaxy = new Parallaxy(element, {
     'y': {
         speed: 0.5,
         invert: false,
@@ -121,14 +120,6 @@ parallaxy.reset(); //To remove transformation of each elements after stop
 <img src="..." data-prl-y data-prl-scale="1.8" data-prl-overflow-y>
                 </code>
             </pre>
-        <h3>JAVASCRIPT</h3>
-        <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelector('img')
-});
-                </code>
-            </pre>
         <!-- END CODE -->
       </div>
 
@@ -149,15 +140,6 @@ new Parallaxy({
 <img src="..." data-prl-x data-prl-speed-x="0.1">
                 </code>
             </pre>
-        <h3>JAVASCRIPT</h3>
-        <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelector('img'),
-    'x': {
-        speed: 0.1
-    }
-});
                 </code>
             </pre>
         <!-- END CODE -->
@@ -211,18 +193,6 @@ new Parallaxy({
 <img src="..." data-prl-y data-prl-overflow-y data-prl-x data-prl-overflow-x data-prl-speed-x="0.2">
                 </code>
             </pre>
-        <h3>JAVASCRIPT</h3>
-        <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelector('img'),
-    'x': {
-        speed: 0.2
-    },
-    'y': {}
-});
-                </code>
-            </pre>
         <!-- END CODE -->
       </div>
 
@@ -242,18 +212,6 @@ new Parallaxy({
         <pre>
                 <code class="language-html">
 <img src="..." data-prl-overflow-x data-prl-x data-prl-speed-x="0.65">
-                </code>
-            </pre>
-        <h3>JAVASCRIPT</h3>
-        <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelector('img'),
-    'x': {
-        speed: 0.5,
-        overflow: true
-    }
-});
                 </code>
             </pre>
         <!-- END CODE -->
@@ -277,18 +235,6 @@ new Parallaxy({
 <img src="..." data-prl-x data-prl-inverted-x data-prl-speed-x="0.2">
                 </code>
             </pre>
-        <h3>JAVASCRIPT</h3>
-        <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelector('img'),
-    'x': {
-        inverted: true,
-        speed: 0.2
-    }
-});
-                </code>
-            </pre>
         <!-- END CODE -->
       </div>
 
@@ -307,15 +253,6 @@ new Parallaxy({
         <pre>
                 <code class="language-html">
 <img src="..." data-prl-y data-prl-breakpoint="(max-width: 600px)">
-                </code>
-            </pre>
-        <h3>JAVASCRIPT</h3>
-        <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelector('img'),
-    breakPoint: "(max-width: 600px)"
-});
                 </code>
             </pre>
         <!-- END CODE -->
@@ -339,18 +276,6 @@ new Parallaxy({
 <img src="..." data-prl-y data-prl-inverted-y data-prl-speed-y="0.12">
                 </code>
             </pre>
-        <h3>JAVASCRIPT</h3>
-        <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelector('img'),
-    'y': {
-        inverted: true,
-        speed: 0.12
-    }
-});
-                </code>
-            </pre>
         <!-- END CODE -->
       </div>
 
@@ -369,15 +294,6 @@ new Parallaxy({
         <pre>
                 <code class="language-html">
 <img src="..." data-prl-y data-prl-axes="100">
-                </code>
-            </pre>
-        <h3>JAVASCRIPT</h3>
-        <pre>
-                <code class="language-javascript">
-new Parallaxy({
-    element: document.querySelector('img'),
-    axes: 100,
-});
                 </code>
             </pre>
         <!-- END CODE -->
