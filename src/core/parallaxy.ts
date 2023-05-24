@@ -19,7 +19,7 @@ class Parallaxy {
 
     config = this.verfiyConfiguration(config);
 
-    element.style.willChange = "transform";
+    // element.style.willChange = "transform";
 
     ParallaxyElements.push({ element, instance: this });
 

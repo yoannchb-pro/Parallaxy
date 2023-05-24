@@ -16,7 +16,7 @@
           if (!element)
               throw "[Parallaxy] 'element' must be specified when you create a new Parallaxy object";
           config = this.verfiyConfiguration(config);
-          element.style.willChange = "transform";
+          // element.style.willChange = "transform";
           ParallaxyElements.push({ element, instance: this });
           this.start();
       }
