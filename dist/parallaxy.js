@@ -4,6 +4,7 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Parallaxy = factory());
 })(this, (function () { 'use strict';
 
+  // import { isIntersecting, observe, unobserve } from "./intersect";
   const ParallaxyElements = [];
   const ParallaxyDefaultconfig = {
       speed: 0.5,
@@ -21,7 +22,6 @@
           this.start();
       }
       verfiyConfiguration(config) {
-          this.windowHeight = window.innerHeight;
           if (!config.x && !config.y)
               config.y = { speed: ParallaxyDefaultconfig.speed };
           if (config.x && !config.x.speed)
@@ -41,7 +41,7 @@
           if (!config.scale)
               config.scale = ParallaxyDefaultconfig.scale;
           if (!config.axes)
-              config.axes = this.windowHeight / 2;
+              config.axes = window.innerHeight / 2;
           return config;
       }
       //TODO
@@ -57,7 +57,12 @@
       start() {
           if (this.matchingBreakingPoint())
               return;
-          this.mainEvent = this.updatePosition.bind(this);
+          // if (this.config.y) observe(this.element);
+          this.mainEvent = () => {
+              if (this.frameId)
+                  window.cancelAnimationFrame(this.frameId);
+              this.frameId = window.requestAnimationFrame(this.updatePosition.bind(this));
+          };
           this.element.addEventListener("load", this.updatePosition.bind(this), {
               once: true,
           });
@@ -65,41 +70,20 @@
           this.updatePosition();
       }
       stop() {
+          // if (this.config.y) unobserve(this.element);
           document.removeEventListener("scroll", this.mainEvent);
           this.reset();
       }
       reset() {
           this.element.style.transform = "";
       }
-      isIntersectingObserver(rec, marge = 50) {
-          const height = this.windowHeight;
-          const additionalHeight = height / 2;
-          //Because rec is only in read mode
-          const pos = {
-              top: rec.top,
-              bottom: rec.bottom,
-          };
-          pos.top = pos.top - marge;
-          pos.bottom = pos.bottom + marge;
-          let vIntersect = false;
-          let topCondition = pos.top >= -additionalHeight && pos.top <= height + additionalHeight;
-          let bottomCondition = pos.bottom >= -additionalHeight &&
-              pos.bottom <= height + additionalHeight;
-          if (topCondition || bottomCondition || (pos.top < 0 && pos.bottom > height))
-              vIntersect = true;
-          if (vIntersect)
-              return true;
-          return false;
-      }
       updatePosition() {
           if (!this.element.isConnected) {
               this.stop();
               return;
           }
+          // if (this.config.y && !isIntersecting(this.element)) return;
           const scaledRect = this.element.getBoundingClientRect();
-          const isIntersecting = this.isIntersectingObserver(scaledRect);
-          if (!isIntersecting)
-              return;
           const transform = [];
           transform.push(this.scale());
           let translation = { x: 0, y: 0 };

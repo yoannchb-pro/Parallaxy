@@ -17,7 +17,7 @@ declare class Parallaxy {
     private element;
     private config;
     private mainEvent;
-    private windowHeight;
+    private frameId;
     constructor(element: HTMLElement, config: Config);
     private verfiyConfiguration;
     //TODO
@@ -26,7 +26,6 @@ declare class Parallaxy {
     start(): void;
     stop(): void;
     reset(): void;
-    private isIntersectingObserver;
     private updatePosition;
     private originalRect;
     private scale;

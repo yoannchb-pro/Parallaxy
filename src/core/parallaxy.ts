@@ -1,6 +1,7 @@
 import EventListener from "types/eventListener";
 import Config from "../types/config";
 import Rect from "types/rect";
+// import { isIntersecting, observe, unobserve } from "./intersect";
 
 const ParallaxyElements: { element: HTMLElement; instance: Parallaxy }[] = [];
 
@@ -11,7 +12,7 @@ const ParallaxyDefaultconfig = {
 
 class Parallaxy {
   private mainEvent: EventListener<Event>;
-  private windowHeight: number;
+  private frameId: number;
 
   constructor(private element: HTMLElement, private config: Config) {
     if (!element)
@@ -27,8 +28,6 @@ class Parallaxy {
   }
 
   private verfiyConfiguration(config: Config) {
-    this.windowHeight = window.innerHeight;
-
     if (!config.x && !config.y)
       config.y = { speed: ParallaxyDefaultconfig.speed };
 
@@ -50,7 +49,7 @@ class Parallaxy {
       throw "[Parallaxy] 'scale' need to be bigger than 1 (or equal but with overflow)";
     if (!config.scale) config.scale = ParallaxyDefaultconfig.scale;
 
-    if (!config.axes) config.axes = this.windowHeight / 2;
+    if (!config.axes) config.axes = window.innerHeight / 2;
 
     return config;
   }
@@ -72,7 +71,13 @@ class Parallaxy {
   start() {
     if (this.matchingBreakingPoint()) return;
 
-    this.mainEvent = this.updatePosition.bind(this);
+    // if (this.config.y) observe(this.element);
+    this.mainEvent = () => {
+      if (this.frameId) window.cancelAnimationFrame(this.frameId);
+      this.frameId = window.requestAnimationFrame(
+        this.updatePosition.bind(this)
+      );
+    };
     this.element.addEventListener("load", this.updatePosition.bind(this), {
       once: true,
     });
@@ -82,6 +87,7 @@ class Parallaxy {
   }
 
   stop() {
+    // if (this.config.y) unobserve(this.element);
     document.removeEventListener("scroll", this.mainEvent);
     this.reset();
   }
@@ -90,45 +96,15 @@ class Parallaxy {
     this.element.style.transform = "";
   }
 
-  private isIntersectingObserver(rec: any, marge: number = 50) {
-    const height = this.windowHeight;
-    const additionalHeight = height / 2;
-
-    //Because rec is only in read mode
-    const pos = {
-      top: rec.top,
-      bottom: rec.bottom,
-    };
-
-    pos.top = pos.top - marge;
-    pos.bottom = pos.bottom + marge;
-
-    let vIntersect = false;
-
-    let topCondition =
-      pos.top >= -additionalHeight && pos.top <= height + additionalHeight;
-    let bottomCondition =
-      pos.bottom >= -additionalHeight &&
-      pos.bottom <= height + additionalHeight;
-
-    if (topCondition || bottomCondition || (pos.top < 0 && pos.bottom > height))
-      vIntersect = true;
-
-    if (vIntersect) return true;
-
-    return false;
-  }
-
   private updatePosition() {
     if (!this.element.isConnected) {
       this.stop();
       return;
     }
 
-    const scaledRect = this.element.getBoundingClientRect();
+    // if (this.config.y && !isIntersecting(this.element)) return;
 
-    const isIntersecting = this.isIntersectingObserver(scaledRect);
-    if (!isIntersecting) return;
+    const scaledRect = this.element.getBoundingClientRect();
 
     const transform = [];
 
