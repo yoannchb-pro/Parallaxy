@@ -1,3 +1,9 @@
+v2.0.0
+
+- Reduced package size
+- Better performance
+- Refactoring
+
 v1.1.0
 
 - Removed parallaxy image adaptation

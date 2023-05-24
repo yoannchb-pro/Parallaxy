@@ -1,8 +1,16 @@
 {
   "name": "parallaxy-img",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Create beautiful parallax with attributes or in javascript",
   "main": "./dist/parallaxy.js",
+  "types": "./dist/parallaxy.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "tsconfig.json",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c"
