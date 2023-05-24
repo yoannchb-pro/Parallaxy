@@ -7,7 +7,7 @@
   // import { isIntersecting, observe, unobserve } from "./intersect";
   const ParallaxyElements = [];
   const ParallaxyDefaultconfig = {
-      speed: 0.5,
+      speed: 0.2,
       scale: 1.5,
   };
   class Parallaxy {
@@ -58,15 +58,17 @@
           if (this.matchingBreakingPoint())
               return;
           // if (this.config.y) observe(this.element);
-          this.mainEvent = () => {
-              if (this.frameId)
-                  window.cancelAnimationFrame(this.frameId);
-              this.frameId = window.requestAnimationFrame(this.updatePosition.bind(this));
-          };
-          this.element.addEventListener("load", this.updatePosition.bind(this), {
-              once: true,
-          });
-          document.addEventListener("scroll", this.mainEvent);
+          // this.mainEvent = () => {
+          //   if (this.frameId) window.cancelAnimationFrame(this.frameId);
+          //   this.frameId = window.requestAnimationFrame(
+          //     this.updatePosition.bind(this)
+          //   );
+          // };
+          //if it's an image, video ...
+          // this.element.addEventListener("load", this.updatePosition.bind(this), {
+          //   once: true,
+          // });
+          // document.addEventListener("scroll", this.mainEvent);
           this.updatePosition();
       }
       stop() {
@@ -95,17 +97,7 @@
           }
           transform.push(`translate3d(${translation.x}px, ${translation.y}px, 0px)`);
           this.element.style.transform = transform.join(" ");
-      }
-      originalRect(scaledRect) {
-          const scale = this.config.scale;
-          const width = scaledRect.width / scale;
-          const height = scaledRect.height / scale;
-          const additionalHeight = scaledRect.height - height;
-          const additionalWidth = scaledRect.width - width;
-          return Object.assign(Object.assign({}, scaledRect), { width,
-              height,
-              additionalHeight,
-              additionalWidth });
+          window.requestAnimationFrame(this.updatePosition.bind(this));
       }
       scale() {
           return `scale(${this.config.scale})`;
@@ -113,34 +105,28 @@
       translateY(scaledRect) {
           const speed = this.config.y.speed;
           const isInverted = this.config.y.inverted;
-          const originalRect = this.originalRect(scaledRect);
-          const scaleSize = originalRect.additionalHeight / 2;
           const elementCenterPosition = scaledRect.top + scaledRect.height / 2;
-          const screenMiddleSize = this.config.axes;
-          const elementPositionFromTop = screenMiddleSize - elementCenterPosition;
+          const elementPositionFromTop = this.config.axes - elementCenterPosition;
           let translation = elementPositionFromTop * speed;
           if (isInverted)
-              translation = -translation; //*(speed/4)
-          const newPosition = scaleSize / this.config.scale;
-          if (!this.config.y.overflow && Math.abs(translation) >= newPosition) {
-              translation = translation < 0 ? -newPosition : newPosition;
+              translation = -translation;
+          const additionalheight = (scaledRect.height - scaledRect.height / this.config.scale) / 2;
+          if (!this.config.y.overflow && Math.abs(translation) >= additionalheight) {
+              translation = translation < 0 ? -additionalheight : additionalheight;
           }
           return translation;
       }
       translateX(scaledRect) {
           const speed = this.config.x.speed;
           const isInverted = this.config.x.inverted;
-          const originalRect = this.originalRect(scaledRect);
-          const scaleSize = originalRect.additionalWidth / 2;
           const elementCenterPosition = scaledRect.top + scaledRect.height / 2;
-          const screenMiddleSize = this.config.axes;
-          const elementPositionFromTop = screenMiddleSize - elementCenterPosition;
+          const elementPositionFromTop = this.config.axes - elementCenterPosition;
           let translation = elementPositionFromTop * speed;
           if (isInverted)
-              translation = -translation; //*(speed/4)
-          const newPosition = scaleSize / this.config.scale;
-          if (!this.config.x.overflow && Math.abs(translation) >= newPosition) {
-              translation = translation < 0 ? -newPosition : newPosition;
+              translation = -translation;
+          const additionalWidth = (scaledRect.width - scaledRect.width / this.config.scale) / 2;
+          if (!this.config.x.overflow && Math.abs(translation) >= additionalWidth) {
+              translation = translation < 0 ? -additionalWidth : additionalWidth;
           }
           return translation;
       }

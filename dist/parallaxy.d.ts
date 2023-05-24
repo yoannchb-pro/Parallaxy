@@ -27,7 +27,6 @@ declare class Parallaxy {
     stop(): void;
     reset(): void;
     private updatePosition;
-    private originalRect;
     private scale;
     private translateY;
     private translateX;
