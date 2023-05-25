@@ -1,6 +1,5 @@
 import Config from "../types/config";
 import Rect from "types/rect";
-import { getConfigFromAttributes } from "./attr-handler";
 
 const ParallaxyElements: { element: HTMLElement; instance: Parallaxy }[] = [];
 
@@ -11,6 +10,8 @@ const ParallaxyDefaultconfig = {
 
 class Parallaxy {
   private frameId: number;
+  private actualTranslation = { x: 0, y: 0 };
+  private actualScale = 1;
 
   constructor(private element: HTMLElement, private config: Config = {}) {
     if (!element)
@@ -59,11 +60,8 @@ class Parallaxy {
    * Update the config on attribute change
    * @param config
    */
-  updateConfig(config?: Config) {
-    const newConfig = this.verfiyConfiguration(
-      config ?? getConfigFromAttributes(this.element)
-    );
-    this.config = newConfig;
+  updateConfig(config: Config = {}) {
+    this.config = this.verfiyConfiguration(config);
     this.stop();
     this.start();
   }
@@ -124,15 +122,28 @@ class Parallaxy {
 
     let translation = { x: 0, y: 0 };
     if (this.config.y) {
-      translation.y = this.translateY(scaledRect);
+      const transY = this.translateY(scaledRect);
+      translation.y = parseFloat(transY.toFixed(2));
     }
     if (this.config.x) {
-      translation.x = this.translateX(scaledRect);
+      const transX = this.translateX(scaledRect);
+      translation.x = parseFloat(transX.toFixed(2));
     }
 
     transform.push(`translate3d(${translation.x}px, ${translation.y}px, 0px)`);
 
-    this.element.style.transform = transform.join(" ");
+    if (
+      this.actualScale !== this.config.scale ||
+      this.actualTranslation.x !== translation.x ||
+      this.actualTranslation.y !== translation.y
+    ) {
+      this.element.style.transform = transform.join(" ");
+
+      this.actualScale = this.config.scale;
+      this.actualTranslation.x = translation.x;
+      this.actualTranslation.y = translation.y;
+    }
+
     this.frameId = window.requestAnimationFrame(this.updatePosition.bind(this));
   }
 

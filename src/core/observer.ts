@@ -1,5 +1,8 @@
 import { findParallaxyElementIndex, parseBooleanAttribute } from "../utils";
-import { ParallaxyAttributesHandler } from "./attr-handler";
+import {
+  ParallaxyAttributesHandler,
+  getConfigFromAttributes,
+} from "./attr-handler";
 import { ParallaxyElements } from "./parallaxy";
 
 function ParallaxyObserver() {
@@ -22,7 +25,9 @@ function ParallaxyObserver() {
         if (isParallaxy && cardIndex === -1) {
           addedNodes.push(element);
         } else if (cardIndex !== -1) {
-          ParallaxyElements[cardIndex].instance.updateConfig();
+          ParallaxyElements[cardIndex].instance.updateConfig(
+            getConfigFromAttributes(ParallaxyElements[cardIndex].element)
+          );
         }
       }
 

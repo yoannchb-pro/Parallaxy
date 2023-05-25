@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v3.0.3
+
+- Little improvement for updateConfig parameter
+- Less translation refreshing
+
 ## v3.0.2
 
 - Fixed updateConfig

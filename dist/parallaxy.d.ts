@@ -17,6 +17,8 @@ declare class Parallaxy {
     private element;
     private config;
     private frameId;
+    private actualTranslation;
+    private actualScale;
     constructor(element: HTMLElement, config?: Config);
     /**
      * Check the configuration and set the default config

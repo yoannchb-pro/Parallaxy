@@ -15,7 +15,7 @@ $ npm i parallaxy-img
 Or with the cdn
 
 ```html
-<script src="https://unpkg.com/parallaxy-img@3.0.2/dist/parallaxy.js"></script>
+<script src="https://unpkg.com/parallaxy-img@3.0.3/dist/parallaxy.js"></script>
 ```
 
 ## Documentation
