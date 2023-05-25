@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v3.0.2
+
+- Fixed updateConfig
+
 ## v3.0.1
 
 - Fixed constructor

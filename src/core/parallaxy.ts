@@ -59,7 +59,7 @@ class Parallaxy {
    * Update the config on attribute change
    * @param config
    */
-  updateConfig(config: Config = {}) {
+  updateConfig(config?: Config) {
     const newConfig = this.verfiyConfiguration(
       config ?? getConfigFromAttributes(this.element)
     );
